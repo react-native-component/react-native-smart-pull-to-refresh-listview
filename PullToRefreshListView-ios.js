@@ -180,7 +180,7 @@ class PullToRefreshListView extends Component {
             scrollEnabled: true
         })
         let {refresh_none, loaded_all, load_more_none} = viewState
-        let {pullUpStayDistance} = this.props
+        let {pullDownStayDistance} = this.props
         this._refreshState = refresh_none
         this._header.setState({
             pullState: this._refreshState,
@@ -188,7 +188,7 @@ class PullToRefreshListView extends Component {
 
         this._refreshBackAnimating = true
 
-        if (this._scrollY < pullUpStayDistance) {
+        if (this._scrollY < pullDownStayDistance) {
             this.requestAnimationFrame(this._resetHeaderLayout)
         }
         else {
@@ -198,7 +198,7 @@ class PullToRefreshListView extends Component {
                 }
             })
 
-            this._scrollView.scrollTo({ y: this._scrollY - pullUpStayDistance, animated: false, })
+            this._scrollView.scrollTo({ y: this._scrollY - pullDownStayDistance, animated: false, })
             this._beginTimeStamp = null
             this._refreshBackAnimating = false
             this._afterRefreshBacked = true
@@ -302,9 +302,9 @@ class PullToRefreshListView extends Component {
             if(this._afterDirectRefresh) {
                 this._afterDirectRefresh = false
 
-                let {pullUpStayDistance} = this.props
+                let {pullDownStayDistance} = this.props
 
-                if(this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight + pullUpStayDistance) {
+                if(this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight + pullDownStayDistance) {
                     this._scrollView.scrollTo({y: this._scrollViewContentHeight - this._scrollViewContainerHeight, animated: false, })
                 }
 
@@ -340,19 +340,19 @@ class PullToRefreshListView extends Component {
 
         let {refresh_idle, refreshing, load_more_idle, loading_more, loaded_all} = viewState
         let {enabledPullUp, enabledPullDown, pullUpDistance, pullDownDistance,} = this.props
-       if (enabledPullUp && this._refreshState != refreshing && this._loadMoreState != loading_more && this._scrollY < 0) {
+       if (enabledPullDown && this._refreshState != refreshing && this._loadMoreState != loading_more && this._scrollY < 0) {
             this._refreshState = refresh_idle
             this._header.setState({
                 pullState: this._refreshState,
-                pullDistancePercent: -this._scrollY / pullUpDistance,
+                pullDistancePercent: -this._scrollY / pullDownDistance,
             })
         }
         else {
-            if (enabledPullDown && this._refreshState != refreshing && this._loadMoreState != loading_more && this._loadMoreState != loaded_all && this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
+            if (enabledPullUp && this._refreshState != refreshing && this._loadMoreState != loading_more && this._loadMoreState != loaded_all && this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
                 this._loadMoreState = load_more_idle
                 this._footer.setState({
                     pullState: this._loadMoreState,
-                    pullDistancePercent: (this._scrollY - this._scrollViewContentHeight + this._scrollViewContainerHeight) / pullDownDistance,
+                    pullDistancePercent: (this._scrollY - this._scrollViewContentHeight + this._scrollViewContainerHeight) / pullUpDistance,
                 })
             }
         }
@@ -366,22 +366,22 @@ class PullToRefreshListView extends Component {
 
         if(this._scrollY < this._lastScrollY) {
             if(this._refreshState == refresh_none && !this._refreshBackAnimating && !this._afterRefreshBacked) {
-                if (enabledPullUp && this._refreshState != refreshing && this._loadMoreState != loading_more && this._scrollY < 0) {
+                if (enabledPullDown && this._refreshState != refreshing && this._loadMoreState != loading_more && this._scrollY < 0) {
                     this._refreshState = refresh_idle
                     this._header.setState({
                         pullState: this._refreshState,
-                        pullDistancePercent: -this._scrollY / pullUpDistance,
+                        pullDistancePercent: -this._scrollY / pullDownDistance,
                     })
                 }
             }
         }
         else {
             if(this._loadMoreState == load_more_none && !this._loadMoreBackAnimating && !this._afterLoadMoreBacked) {
-                if (enabledPullDown && !autoLoadMore && this._refreshState != refreshing && this._loadMoreState != loading_more && this._loadMoreState != loaded_all && this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
+                if (enabledPullUp && !autoLoadMore && this._refreshState != refreshing && this._loadMoreState != loading_more && this._loadMoreState != loaded_all && this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
                     this._loadMoreState = load_more_idle
                     this._footer.setState({
                         pullState: this._loadMoreState,
-                        pullDistancePercent: (this._scrollY - this._scrollViewContentHeight + this._scrollViewContainerHeight) / pullDownDistance,
+                        pullDistancePercent: (this._scrollY - this._scrollViewContentHeight + this._scrollViewContainerHeight) / pullUpDistance,
                     })
                 }
             }
@@ -389,7 +389,7 @@ class PullToRefreshListView extends Component {
 
         if (this._scrollY < 0) {
             if (this._refreshState == refresh_idle || this._refreshState == will_refresh) {
-                if (-this._scrollY >= pullUpDistance) {
+                if (-this._scrollY >= pullDownDistance) {
                     if (this._refreshState == refresh_idle) {
                         this._refreshState = will_refresh
                     }
@@ -401,13 +401,13 @@ class PullToRefreshListView extends Component {
                 }
                 this._header.setState({
                     pullState: this._refreshState,
-                    pullDistancePercent: -this._scrollY / pullUpDistance,
+                    pullDistancePercent: -this._scrollY / pullDownDistance,
                 })
             }
         }
         else if (!autoLoadMore && this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
             if (this._loadMoreState == load_more_idle || this._loadMoreState == will_load_more) {
-                if (this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight + pullDownDistance) {
+                if (this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight + pullUpDistance) {
                     if (this._loadMoreState == load_more_idle) {
                         this._loadMoreState = will_load_more
                     }
@@ -419,7 +419,7 @@ class PullToRefreshListView extends Component {
                 }
                 this._footer.setState({
                     pullState: this._loadMoreState,
-                    pullDistancePercent: (this._scrollY - this._scrollViewContentHeight + this._scrollViewContainerHeight) / pullDownDistance,
+                    pullDistancePercent: (this._scrollY - this._scrollViewContentHeight + this._scrollViewContainerHeight) / pullUpDistance,
                 })
             }
         }
@@ -471,11 +471,11 @@ class PullToRefreshListView extends Component {
         let {will_refresh, refreshing, will_load_more, loading_more} = viewState
 
         if (this._loadMoreState != loading_more && this._refreshState == will_refresh && !this._refreshBackAnimating && !this._afterRefreshBacked) {
-            let {pullUpStayDistance} = this.props
-            this._refreshFixScrollY = this._scrollY + pullUpStayDistance
+            let {pullDownStayDistance} = this.props
+            this._refreshFixScrollY = this._scrollY + pullDownStayDistance
             this._header.setNativeProps({
                 style: {
-                    height: pullUpStayDistance,
+                    height: pullDownStayDistance,
                 }
             })
             this._scrollView.scrollTo({ y: this._refreshFixScrollY, animated: false, })
@@ -490,10 +490,10 @@ class PullToRefreshListView extends Component {
         }
         else {
             if (this._refreshState != refreshing && this._loadMoreState == will_load_more && !this._loadMoreBackAnimating && !this._afterLoadMoreBacked) {
-                let {pullDownStayDistance} = this.props
+                let {pullUpStayDistance} = this.props
                 this._footer.setNativeProps({
                     style: {
-                        height: pullDownStayDistance,
+                        height: pullUpStayDistance,
                     }
                 })
                 this._loadMoreState = loading_more
@@ -529,16 +529,16 @@ class PullToRefreshListView extends Component {
     }
 
     _resetReverseHeaderLayout = (timestamp) => {
-        let {pullUpStayDistance} = this.props
+        let {pullDownStayDistance} = this.props
         let headerHeight
         if (!this._beginTimeStamp) {
-            headerHeight = pullUpStayDistance
+            headerHeight = pullDownStayDistance
             this._beginTimeStamp = timestamp
         }
         else {
-            headerHeight = pullUpStayDistance * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
-            if (headerHeight > pullUpStayDistance) {
-                headerHeight = pullUpStayDistance
+            headerHeight = pullDownStayDistance * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            if (headerHeight > pullDownStayDistance) {
+                headerHeight = pullDownStayDistance
             }
         }
         this._header.setNativeProps({
@@ -550,7 +550,7 @@ class PullToRefreshListView extends Component {
         if (timestamp - this._beginTimeStamp > refreshAnimationDuration) {
             this._header.setNativeProps({
                 style: {
-                    height: pullUpStayDistance,
+                    height: pullDownStayDistance,
                 }
             })
             this._beginTimeStamp = null
@@ -564,15 +564,15 @@ class PullToRefreshListView extends Component {
 
     _resetHeaderLayout = (timestamp) => {
         let {loaded_all, load_more_none} = viewState
-        let {pullUpStayDistance} = this.props
+        let {pullDownStayDistance} = this.props
         let headerHeight
         if (!this._beginTimeStamp) {
-            headerHeight = pullUpStayDistance
+            headerHeight = pullDownStayDistance
             this._beginTimeStamp = timestamp
             this._fixedScrollY = this._scrollY > 0 ? this._scrollY : 0
         }
         else {
-            headerHeight = pullUpStayDistance - (pullUpStayDistance - this._fixedScrollY) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            headerHeight = pullDownStayDistance - (pullDownStayDistance - this._fixedScrollY) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
             if (headerHeight < 0) {
                 headerHeight = 0
             }
@@ -621,20 +621,20 @@ class PullToRefreshListView extends Component {
     }
 
     _resetFooterLayout = (timestamp) => {
-        let {pullDownStayDistance} = this.props
+        let {pullUpStayDistance} = this.props
         let footerHeight, scrollViewTranslateY
         if (!this._beginTimeStamp) {
-            footerHeight = pullDownStayDistance
+            footerHeight = pullUpStayDistance
             scrollViewTranslateY = 0
             this._beginTimeStamp = timestamp
             this._fixedScrollY = this._scrollY
         }
         else {
             let scrollViewTranslateMaxY
-            footerHeight = pullDownStayDistance - pullDownStayDistance * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            footerHeight = pullUpStayDistance - pullUpStayDistance * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
 
-            if (this._touching && (this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)) > pullDownStayDistance) {
-                scrollViewTranslateMaxY = pullDownStayDistance
+            if (this._touching && (this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)) > pullUpStayDistance) {
+                scrollViewTranslateMaxY = pullUpStayDistance
             }
             else {
                 scrollViewTranslateMaxY = this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)
