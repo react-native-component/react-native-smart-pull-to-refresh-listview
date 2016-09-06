@@ -171,11 +171,11 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
 
 //                Log.i("Test", "canChildScrollUp scrollY = " + scrollY + "| height = " + height + " | scrollViewMeasuredHeight = " + scrollViewMeasuredHeight);
 
-                if (enabledPullUp && scrollY == 0 && f > 0) {
+                if (enabledPullDown && scrollY == 0 && f > 0) {
                     //滑动到了顶端 view.getScrollY()="+scrollY);
                     //Log.i("Test", "canChildScrollUp:" + f);
                     flag = false;
-                } else if (enabledPullDown && (scrollY + height) >= scrollViewMeasuredHeight && f < 0) {
+                } else if (enabledPullUp && (scrollY + height) >= scrollViewMeasuredHeight && f < 0) {
                     //滑动到了底部 scrollY="+scrollY);
                     //Log.i("Test", "canChildScrollUp:" + f);
                     flag = false;
