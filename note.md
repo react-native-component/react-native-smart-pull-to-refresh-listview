@@ -45,8 +45,8 @@
   [number]pullUpStayDistance
   [number]pullDownDistance
   [number]pullDownStayDistance
-  [bool]disabledPullUp
-  [bool]disabledPullDown
+  [bool]enabledPullUp
+  [bool]enabledPullDown
 * api:
   [func]beginRefresh
   [func]endRefresh
