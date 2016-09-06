@@ -266,7 +266,7 @@ class PullToRefreshListView extends Component {
     }
 
     _setPaddingBlank = () => {
-        let innerViewRef = this._scrollView._innerViewRef || this._innerScrollView._innerViewRef
+        let innerViewRef = this._scrollView.refs.InnerScrollView || this._scrollView._innerViewRef || this._innerScrollView._innerViewRef
         innerViewRef.measure((ox, oy, width, height, px, py) => {
             if (height - this._paddingBlankDistance < this._scrollViewContainerHeight) {
                 this._paddingBlankDistance = this._scrollViewContainerHeight - (height - this._paddingBlankDistance)
@@ -320,7 +320,7 @@ class PullToRefreshListView extends Component {
         this._touching = true
 
         if (this._refreshBackAnimationFrame) {
-            cancelAnimationFrame(this._refreshBackAnimationFrame)
+            this.cancelAnimationFrame(this._refreshBackAnimationFrame)
             this._beginResetScrollTopTimeStamp = null
         }
 
@@ -377,7 +377,7 @@ class PullToRefreshListView extends Component {
         }
         else {
             if(this._loadMoreState == load_more_none && !this._loadMoreBackAnimating && !this._afterLoadMoreBacked) {
-                if (enabledPullDown && this._refreshState != refreshing && this._loadMoreState != loading_more && this._loadMoreState != loaded_all && this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
+                if (enabledPullDown && !autoLoadMore && this._refreshState != refreshing && this._loadMoreState != loading_more && this._loadMoreState != loaded_all && this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
                     this._loadMoreState = load_more_idle
                     this._footer.setState({
                         pullState: this._loadMoreState,
