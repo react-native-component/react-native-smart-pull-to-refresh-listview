@@ -12,7 +12,7 @@ This component is compatible with React Native 0.25 and newer.
 ## Installation
 
 ```
-npm install react-native-pull-to-refresh-listview --save
+npm install react-native-smart-pull-to-refresh-listview --save
 ```
 
 ## Installation (Android)
