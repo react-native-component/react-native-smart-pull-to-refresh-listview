@@ -19,7 +19,6 @@ import {
     ProgressBarAndroid,
     ActivityIndicatorIOS,
     Platform,
-    RecyclerViewBackedScrollView
 } from 'react-native'
 
 import TimerEnhance from '../react-native-smart-timer-enhance'
@@ -75,7 +74,7 @@ class PullToRefreshListView extends Component {
             rowHasChanged: (r1, r2) => r1 !== r2,
         }),
         renderRow: () => null,
-        renderScrollComponent: props => <RecyclerViewBackedScrollView {...props} />,
+        renderScrollComponent: props => <ScrollView {...props}/>,
         onEndReachedThreshold: 0,
     }
 
@@ -89,6 +88,7 @@ class PullToRefreshListView extends Component {
         pullUpStayDistance: PropTypes.number,
         pullDownDistance: PropTypes.number,
         pullDownStayDistance: PropTypes.number,
+        onEndReachedThreshold: PropTypes.number,
         enabledPullUp: PropTypes.bool,
         enabledPullDown: PropTypes.bool,
         autoLoadMore: PropTypes.bool,
@@ -153,7 +153,7 @@ class PullToRefreshListView extends Component {
                         onResponderRelease={this._onResponderRelease}
                         renderHeader={this._renderHeader}
                         renderFooter={this._renderFooter}
-                        renderScrollComponent={ props => <RecyclerViewBackedScrollView ref={ (component) => this._innerScrollView = component } {...props} /> }/> }
+                        renderScrollComponent={ props => <ScrollView ref={ (component) => this._innerScrollView = component } {...props} /> }/> }
                 </AndroidSwipeRefreshLayout>
         )
     }
@@ -438,7 +438,7 @@ class PullToRefreshListView extends Component {
     }
 
     _setPaddingBlank = () => {
-        let innerViewRef = this._scrollView.refs.InnerScrollView || this._scrollView._innerViewRef || this._innerScrollView.refs.InnerView
+        let innerViewRef = this._scrollView.refs.InnerScrollView || this._scrollView._innerViewRef || this._innerScrollView.refs.InnerScrollView || this._innerScrollView._innerViewRef
         innerViewRef.measure((ox, oy, width, height, px, py) => {
             if (height - this._paddingBlankDistance < this._scrollViewContainerHeight) {
                 this._paddingBlankDistance = this._scrollViewContainerHeight - (height - this._paddingBlankDistance)
@@ -489,7 +489,21 @@ class PullToRefreshListView extends Component {
     }
 
     _onScroll = (e) => {
+        let {refreshing, load_more_none, loading_more, } = viewState
+        let {autoLoadMore, } = this.props
         this._scrollY = e.nativeEvent.contentOffset.y
+
+        if(autoLoadMore && withinErrorMargin(this._scrollY, this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold)
+                || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold ) {
+            if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
+                this._loadMoreState = loading_more
+                this._footer.setState({
+                    pullState: this._loadMoreState,
+                })
+
+                this.props.onLoadMore && this.props.onLoadMore()
+            }
+        }
     }
 
     _resetReverseHeaderLayout = (timestamp) => {
