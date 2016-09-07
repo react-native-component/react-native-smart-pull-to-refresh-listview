@@ -69,6 +69,7 @@ class PullToRefreshListView extends Component {
         enabledPullUp: true,
         enabledPullDown: true,
         autoLoadMore: false,
+        scrollEventThrottle: 16,
         dataSource: new ListView.DataSource({
             rowHasChanged: (r1, r2) => r1 !== r2,
         }),
