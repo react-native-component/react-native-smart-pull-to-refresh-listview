@@ -368,6 +368,6 @@ enabledPullDown       | bool   | Yes      | true      | when the value is false,
 * endLoadMore: end pull up load more
 
 
-[1]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-ios-v1.0.1.gif
+[1]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-v1.0.1.gif
 [2]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-android-v1.0.1.gif
 [3]: http://facebook.github.io/react-native/docs/listview.html#props
