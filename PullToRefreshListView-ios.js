@@ -19,7 +19,6 @@ import {
     ProgressBarAndroid,
     ActivityIndicatorIOS,
     Platform,
-    RecyclerViewBackedScrollView
 } from 'react-native'
 
 import TimerEnhance from '../react-native-smart-timer-enhance'
@@ -74,7 +73,7 @@ class PullToRefreshListView extends Component {
             rowHasChanged: (r1, r2) => r1 !== r2,
         }),
         renderRow: () => null,
-        renderScrollComponent: props => <RecyclerViewBackedScrollView {...props} />,
+        renderScrollComponent: props => <ScrollView {...props}/>,
         onEndReachedThreshold: 0,
     }
 
@@ -84,6 +83,7 @@ class PullToRefreshListView extends Component {
             viewType.scrollView,
             viewType.listView,
         ]),
+        onEndReachedThreshold: PropTypes.number,
         pullUpDistance: PropTypes.number,
         pullUpStayDistance: PropTypes.number,
         pullDownDistance: PropTypes.number,
@@ -145,7 +145,7 @@ class PullToRefreshListView extends Component {
                     onResponderRelease={this._onResponderRelease}
                     renderHeader={this._renderHeader}
                     renderFooter={this._renderFooter}
-                    renderScrollComponent={ props => <RecyclerViewBackedScrollView ref={ (component) => this._innerScrollView = component } {...props} /> }/>
+                    renderScrollComponent={ props => <ScrollView ref={ (component) => this._innerScrollView = component } {...props} /> }/>
         )
     }
 
@@ -266,7 +266,7 @@ class PullToRefreshListView extends Component {
     }
 
     _setPaddingBlank = () => {
-        let innerViewRef = this._scrollView.refs.InnerScrollView || this._scrollView._innerViewRef || this._innerScrollView._innerViewRef
+        let innerViewRef = this._scrollView.refs.InnerScrollView || this._scrollView._innerViewRef || this._innerScrollView.refs.InnerScrollView || this._innerScrollView._innerViewRef
         innerViewRef.measure((ox, oy, width, height, px, py) => {
             if (height - this._paddingBlankDistance < this._scrollViewContainerHeight) {
                 this._paddingBlankDistance = this._scrollViewContainerHeight - (height - this._paddingBlankDistance)
