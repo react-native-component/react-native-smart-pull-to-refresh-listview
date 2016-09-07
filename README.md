@@ -59,6 +59,10 @@ protected List<ReactPackage> getPackages() {
 
 ```
 
+## Full Demo
+
+see [ReactNativeComponentDemos][0]
+
 ## Usage
 
 ```js
@@ -367,7 +371,7 @@ enabledPullDown       | bool   | Yes      | true      | when the value is false,
 * endRefresh: end pull down refresh
 * endLoadMore: end pull up load more
 
-
+[0]: https://github.com/cyqresig/ReactNativeComponentDemos
 [1]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-v1.0.1.gif
 [2]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-android-v1.0.1.gif
 [3]: http://facebook.github.io/react-native/docs/listview.html#props
