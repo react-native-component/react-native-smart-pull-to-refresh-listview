@@ -21,7 +21,8 @@ import {
     Platform,
 } from 'react-native'
 
-import TimerEnhance from '../react-native-smart-timer-enhance'
+//import TimerEnhance from '../react-native-smart-timer-enhance'
+import TimerEnhance from 'react-native-smart-timer-enhance'
 import { withinErrorMargin, } from './utils'
 import constants, {
     viewType,
