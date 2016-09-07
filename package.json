@@ -1,6 +1,6 @@
 {
   "name": "@react-native-component/react-native-smart-pull-to-refresh-listview",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A smart pull-down-refresh and pull-up-loadmore react-native listview, for ios, written in pure JS, for android, written in JS and Java.",
   "main": "PullToRefreshListView",
   "scripts": {
@@ -28,6 +28,6 @@
   },
   "homepage": "https://github.com/react-native-component/react-native-smart-pull-to-refresh-listview#readme",
   "dependencies": {
-    "react-native-smart-timer-enhance": "^1.0.2"
+    "react-native-smart-timer-enhance": "^1.0.1"
   }
 }
