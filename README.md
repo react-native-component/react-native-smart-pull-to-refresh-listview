@@ -352,12 +352,13 @@ viewType              | enum   | Yes      | Symbol    | determines the viewType 
 autoLoadMore          | bool   | Yes      | false     | when the value is true, pull up load more will be auto
 onRefresh             | func   | Yes      |           | when refreshing, this function will be called
 onLoadMore            | func   | Yes      |           | when loadingMore, this function will be called
+onEndReachedThreshold | number | Yes      | 0         | threshold in pixels (virtual, not physical) for calling onLoadMore
 pullUpDistance        | number | Yes      | 35        | determines the pull up max distance
 pullUpStayDistance    | number | Yes      | 50        | determines the pull up stay distance
 pullDownDistance      | number | Yes      | 35        | determines the pull down max distance
 pullDownStayDistance  | number | Yes      | 50        | determines the pull down stay distance
-enabledPullUp         | bool   | Yes      | true      | when the value is false, pull down load more will be auto
-enabledPullDown       | bool   | Yes      | true      |
+enabledPullUp         | bool   | Yes      | true      | when the value is false, pull down refresh will be auto
+enabledPullDown       | bool   | Yes      | true      | when the value is false, pull up load more will be auto
 
 
 ## Method
@@ -367,6 +368,6 @@ enabledPullDown       | bool   | Yes      | true      |
 * endLoadMore: end pull up load more
 
 
-[1]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-ios-v1.0.0.gif
-[2]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-android-v1.0.0.gif
+[1]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-ios-v1.0.1.gif
+[2]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-android-v1.0.1.gif
 [3]: http://facebook.github.io/react-native/docs/listview.html#props
