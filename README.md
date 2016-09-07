@@ -32,11 +32,9 @@ project(':react-native-smart-swipe-refresh-layout').projectDir = new File(rootPr
 dependencies {
     ...
     // From node_modules
-    compile project(':react-native-smart-splashscreen')
+    compile project(':react-native-smart-swipe-refresh-layout')
 }
 ```
-
-* if you want change image, replace res/drawable/splash.png
 
 * In MainActivity.java
 
