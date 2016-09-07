@@ -70,13 +70,16 @@ class PullToRefreshListView extends Component {
         enabledPullUp: true,
         enabledPullDown: true,
         autoLoadMore: false,
-        scrollEventThrottle: 16,
         dataSource: new ListView.DataSource({
             rowHasChanged: (r1, r2) => r1 !== r2,
         }),
         renderRow: () => null,
         renderScrollComponent: props => <ScrollView {...props}/>,
         onEndReachedThreshold: 0,
+        initialListSize: 10,
+        stickyHeaderIndices: [],
+        pageSize: 1,
+        scrollRenderAheadDistance: 1000,
     }
 
     static propTypes = {
