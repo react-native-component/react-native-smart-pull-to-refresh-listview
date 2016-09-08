@@ -3,7 +3,6 @@ A smart pull-down-refresh and pull-up-loadmore react-native listview,
 for ios, written in pure JS, for android, written in JS and Java.
 
 This component is compatible with React Native 0.25 and newer.
-Because of the changed react native source api, it is not compatible with React Native 0.30 and newer for android now.
 
 ## Preview
 
