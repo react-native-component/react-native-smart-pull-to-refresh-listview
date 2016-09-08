@@ -41,7 +41,7 @@ dependencies {
 
 ```
 ...
-import com.reactnativecomponent.splashscreen.RCTSplashScreenPackage;    //import package
+import com.reactnativecomponent.swiperefreshlayout.RCTSwipeRefreshLayoutPackage;    //import package
 ...
 /**
  * A list of packages used by the app. If the app uses additional views
@@ -51,12 +51,42 @@ import com.reactnativecomponent.splashscreen.RCTSplashScreenPackage;    //import
 protected List<ReactPackage> getPackages() {
     return Arrays.<ReactPackage>asList(
         new MainReactPackage(),
-        new RCTSplashScreenPackage(this)    //register Module
+        new RCTSwipeRefreshLayoutPackage()  //register Module
     );
 }
 ...
 
 ```
+
+* If you're using react-native 0.30+, follow these extra steps
+
+    * In node_modules/react-native-smart-pull-to-refresh-listview/android/src/main/java/com/reactnativecomponent/swiperefreshlayout/
+
+        * In TouchEvent.java
+
+            ```
+            ...
+            public TouchEvent(int viewTag, long timestampMs, int movement) {
+                //super(viewTag, timestampMs);  //for older version
+                super(viewTag);                 //for newer version
+                this.movement = movement;
+            }
+            ...
+            ```
+        *  In TouchUpEvent.java
+
+            ```
+            ...
+            public TouchUpEvent(int viewTag, long timestampMs) {
+                //super(viewTag, timestampMs);  //for older verion
+                super(viewTag);                 //for newer version
+            }
+            ...
+            ```
+
+## Full Demo
+
+see [ReactNativeComponentDemos][0]
 
 ## Usage
 
@@ -150,25 +180,25 @@ export default class PullToRefreshListViewDemo extends Component {
             case refresh_none:
                 return (
                     <View style={{height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        <Text>下拉可以刷新</Text>
+                        <Text>pull down to refresh</Text>
                     </View>
                 )
             case refresh_idle:
                 return (
                     <View style={{height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        <Text>下拉可以刷新{pullDistancePercent}%</Text>
+                        <Text>pull down to refresh{pullDistancePercent}%</Text>
                     </View>
                 )
             case will_refresh:
                 return (
                     <View style={{height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        <Text>松开立即刷新{pullDistancePercent > 100 ? 100 : pullDistancePercent}%</Text>
+                        <Text>release to refresh{pullDistancePercent > 100 ? 100 : pullDistancePercent}%</Text>
                     </View>
                 )
             case refreshing:
                 return (
                     <View style={{flexDirection: 'row', height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        {this._renderActivityIndicator()}<Text>正在刷新</Text>
+                        {this._renderActivityIndicator()}<Text>refreshing</Text>
                     </View>
                 )
         }
@@ -182,31 +212,31 @@ export default class PullToRefreshListViewDemo extends Component {
             case load_more_none:
                 return (
                     <View style={{height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        <Text>上拉加载更多</Text>
+                        <Text>pull up to load more</Text>
                     </View>
                 )
             case load_more_idle:
                 return (
                     <View style={{height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        <Text>上拉加载更多{pullDistancePercent}%</Text>
+                        <Text>pull up to load more{pullDistancePercent}%</Text>
                     </View>
                 )
             case will_load_more:
                 return (
                     <View style={{height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        <Text>松开立即加载{pullDistancePercent > 100 ? 100 : pullDistancePercent}%</Text>
+                        <Text>release to load more{pullDistancePercent > 100 ? 100 : pullDistancePercent}%</Text>
                     </View>
                 )
             case loading_more:
                 return (
                     <View style={{flexDirection: 'row', height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        {this._renderActivityIndicator()}<Text>正在加载</Text>
+                        {this._renderActivityIndicator()}<Text>loading</Text>
                     </View>
                 )
             case loaded_all:
                 return (
                     <View style={{height: 35, justifyContent: 'center', alignItems: 'center', backgroundColor: 'pink',}}>
-                        <Text>已加载全部</Text>
+                        <Text>no more</Text>
                     </View>
                 )
         }
