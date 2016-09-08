@@ -159,7 +159,7 @@ class PullToRefreshListView extends Component {
                         renderHeader={this._renderHeader}
                         renderFooter={this._renderFooter}
                         renderScrollComponent={ props => <ScrollView ref={ (component) => this._innerScrollView = component } {...props} /> }/> }
-                </AndroidSwipeRefreshLayout>
+            </AndroidSwipeRefreshLayout>
         )
     }
 
@@ -342,7 +342,7 @@ class PullToRefreshListView extends Component {
         else if(movement < 0) {
             if(enabledPullUp && !autoLoadMore) {
                 if(this._loadMoreState == load_more_none) {
-                     this._loadMoreState = load_more_idle
+                    this._loadMoreState = load_more_idle
                     this._footer.setState({
                         pullState: this._loadMoreState,
                         pullDistancePercent: Math.abs(movement) / pullUpDistance,
@@ -403,6 +403,7 @@ class PullToRefreshListView extends Component {
             let {will_refresh, refreshing, } = viewState
 
             if (this._refreshState == will_refresh) {
+
                 //disable swipe event
                 this._swipeRefreshLayout.setNativeProps({
                     refreshing: true,
@@ -423,6 +424,7 @@ class PullToRefreshListView extends Component {
             if(this._moveMent < 0) {
                 let {will_load_more, loading_more, } = viewState
                 if (this._loadMoreState == will_load_more) {
+
                     //disable swipe event
                     this._swipeRefreshLayout.setNativeProps({
                         refreshing: true,
@@ -498,8 +500,16 @@ class PullToRefreshListView extends Component {
         let {autoLoadMore, } = this.props
         this._scrollY = e.nativeEvent.contentOffset.y
 
+        /**
+         * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)Android ScrollView scrolls to bottom may occur scrollTop larger than it should be
+         */
+        if(this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
+            this._scrollY = this._scrollViewContentHeight - this._scrollViewContainerHeight
+            this._scrollView.scrollTo({y: this._scrollY, animated: false, })
+        }
+
         if(autoLoadMore && withinErrorMargin(this._scrollY, this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold)
-                || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold ) {
+            || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold ) {
             if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
                 this._loadMoreState = loading_more
                 this._footer.setState({
