@@ -24,12 +24,12 @@ import {
 //import TimerEnhance from '../react-native-smart-timer-enhance'
 import TimerEnhance from 'react-native-smart-timer-enhance'
 import { withinErrorMargin, } from './utils'
-import constants, { 
-    viewType, 
+import constants, {
+    viewType,
     viewState,
     refreshViewType,
-    refreshAnimationDuration, 
-    scrollBounceAnimationDuration, 
+    refreshAnimationDuration,
+    scrollBounceAnimationDuration,
 } from './constants'
 import { easeOutCirc, } from './easing'
 import RefreshView from './RefreshView'
@@ -104,6 +104,13 @@ class PullToRefreshListView extends Component {
         super(props)
         this.state = {}
         let {refresh_none, load_more_none} = viewState
+
+        /**
+         * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+         * ScrollView does not exist this strange bug
+         */
+        this._fixedBoundary = !props.autoLoadMore && props.viewType == viewType.scrollView ? 0 : StyleSheet.hairlineWidth
+
         this._refreshState = refresh_none
         this._loadMoreState = load_more_none
         this._refreshBackAnimating = false
@@ -154,6 +161,20 @@ class PullToRefreshListView extends Component {
         )
     }
 
+    componentDidMount () {
+        /**
+         * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+         * ScrollView does not exist this strange bug
+         */
+        if(!this.props.autoLoadMore && this.props.viewType == viewType.listView) {
+            this._footer.setNativeProps({
+                style: {
+                    height: this._fixedBoundary
+                }
+            })
+        }
+    }
+
     setNativeProps = (props) => {
         this._scrollView.setNativeProps(props)
     }
@@ -199,7 +220,12 @@ class PullToRefreshListView extends Component {
         else {
             this._header.setNativeProps({
                 style: {
-                    height: 0,
+                    //height: 0,
+                    /**
+                     * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+                     * ScrollView does not exist this strange bug
+                     */
+                    height: this._fixedBoundary,
                 }
             })
 
@@ -227,7 +253,6 @@ class PullToRefreshListView extends Component {
                     pullDistancePercent: 0,
                 })
             }
-
         }
     }
 
@@ -253,7 +278,12 @@ class PullToRefreshListView extends Component {
             else {
                 this._footer.setNativeProps({
                     style: {
-                        height: 0,
+                        //height: 0,
+                        /**
+                         * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+                         * ScrollView does not exist this strange bug
+                         */
+                        height: this._fixedBoundary,
                     }
                 })
                 this._scrollView.scrollTo({ y: this._scrollY, animated: false, })
@@ -279,6 +309,15 @@ class PullToRefreshListView extends Component {
             else {
                 this._paddingBlankDistance = 0
             }
+
+            /**
+             * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+             * ScrollView does not exist this strange bug
+             */
+            if(!this.props.autoLoadMore && this.props.viewType == viewType.listView) {
+                this._paddingBlankDistance = this._paddingBlankDistance - StyleSheet.hairlineWidth
+            }
+
             this._footer.setNativeProps({
                 style: {
                     marginTop: this._paddingBlankDistance,
@@ -345,7 +384,7 @@ class PullToRefreshListView extends Component {
 
         let {refresh_idle, refreshing, load_more_idle, loading_more, loaded_all} = viewState
         let {enabledPullUp, enabledPullDown, pullUpDistance, pullDownDistance,} = this.props
-       if (enabledPullDown && this._refreshState != refreshing && this._loadMoreState != loading_more && this._scrollY < 0) {
+        if (enabledPullDown && this._refreshState != refreshing && this._loadMoreState != loading_more && this._scrollY < 0) {
             this._refreshState = refresh_idle
             this._header.setState({
                 pullState: this._refreshState,
@@ -578,8 +617,15 @@ class PullToRefreshListView extends Component {
         }
         else {
             headerHeight = pullDownStayDistance - (pullDownStayDistance - this._fixedScrollY) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
-            if (headerHeight < 0) {
-                headerHeight = 0
+            //if (headerHeight < 0) {
+            //    headerHeight = 0
+            //}
+            /**
+             * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+             * ScrollView does not exist this strange bug
+             */
+            if (headerHeight < this._fixedBoundary) {
+                headerHeight = this._fixedBoundary
             }
         }
         this._header.setNativeProps({
@@ -591,7 +637,12 @@ class PullToRefreshListView extends Component {
         if (timestamp - this._beginTimeStamp > refreshAnimationDuration) {
             this._header.setNativeProps({
                 style: {
-                    height: 0,
+                    //height: 0,
+                    /**
+                     * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+                     * ScrollView does not exist this strange bug
+                     */
+                    height: this._fixedBoundary
                 }
             })
             if (this._fixedScrollY > 0) {
@@ -645,11 +696,21 @@ class PullToRefreshListView extends Component {
                 scrollViewTranslateMaxY = this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)
             }
             scrollViewTranslateY = scrollViewTranslateMaxY * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
-            if (footerHeight < 0) {
-                footerHeight = 0
+            //if (footerHeight < 0) {
+            //    footerHeight = 0
+            //}
+            //if (scrollViewTranslateY > scrollViewTranslateMaxY) {
+            //    scrollViewTranslateY = scrollViewTranslateMaxY
+            //}
+            /**
+             * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+             * ScrollView does not exist this strange bug
+             */
+            if (footerHeight < this._fixedBoundary) {
+                footerHeight = this._fixedBoundary
             }
-            if (scrollViewTranslateY > scrollViewTranslateMaxY) {
-                scrollViewTranslateY = scrollViewTranslateMaxY
+            if (scrollViewTranslateY > scrollViewTranslateMaxY - this._fixedBoundary) {
+                scrollViewTranslateY = scrollViewTranslateMaxY - this._fixedBoundary
             }
         }
 
