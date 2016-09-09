@@ -166,12 +166,19 @@ class PullToRefreshListView extends Component {
          * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
          * ScrollView does not exist this strange bug
          */
-        if(!this.props.autoLoadMore && this.props.viewType == viewType.listView) {
-            this._footer.setNativeProps({
+        if(this.props.viewType == viewType.listView) {
+            this._header.setNativeProps({
                 style: {
                     height: this._fixedBoundary
                 }
             })
+            if(!this.props.autoLoadMore) {
+                this._footer.setNativeProps({
+                    style: {
+                        height: this._fixedBoundary
+                    }
+                })
+            }
         }
     }
 
@@ -236,14 +243,14 @@ class PullToRefreshListView extends Component {
 
             this._afterDirectRefresh = true
 
-            this._setPaddingBlank()
-
             //force show footer
             this._footer.setNativeProps({
                 style: {
                     opacity: 1,
                 }
             })
+
+            this._setPaddingBlank()
 
             //reset loadMoreState to load_more_none
             if(this._loadMoreState == loaded_all) {
@@ -310,17 +317,23 @@ class PullToRefreshListView extends Component {
                 this._paddingBlankDistance = 0
             }
 
+            //this._footer.setNativeProps({
+            //    style: {
+            //        marginTop: this._paddingBlankDistance,
+            //    }
+            //})
             /**
              * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
              * ScrollView does not exist this strange bug
              */
-            if(!this.props.autoLoadMore && this.props.viewType == viewType.listView) {
-                this._paddingBlankDistance = this._paddingBlankDistance - StyleSheet.hairlineWidth
+            let {autoLoadMore, enabledPullUp, enabledPullDown, } = this.props
+            let ratio = 1 //always includes PullDown
+            if(enabledPullUp && !autoLoadMore) {
+                ratio++
             }
-
             this._footer.setNativeProps({
                 style: {
-                    marginTop: this._paddingBlankDistance,
+                    marginTop: this._paddingBlankDistance - this._fixedBoundary * ratio,
                 }
             })
         })
@@ -353,8 +366,6 @@ class PullToRefreshListView extends Component {
                 }
 
             }
-
-
         }
 
         this.props.onContentSizeChange && this.props.onContentSizeChange(contentWidth, contentHeight)
@@ -652,14 +663,14 @@ class PullToRefreshListView extends Component {
             this._refreshBackAnimating = false
             this._afterRefreshBacked = true
 
-            this._setPaddingBlank()
-
             //force show footer
             this._footer.setNativeProps({
                 style: {
                     opacity: 1,
                 }
             })
+
+            this._setPaddingBlank()
 
             //reset loadMoreState to load_more_none
             if(this._loadMoreState == loaded_all) {
