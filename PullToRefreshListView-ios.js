@@ -209,6 +209,11 @@ class PullToRefreshListView extends Component {
     }
 
     endRefresh = () => {
+        //wait for ui update, if not, it may occur incorrect content size
+        this.setTimeout(this._endRefresh, 25)
+    }
+
+    _endRefresh = () => {
         this._scrollView.setNativeProps({
             scrollEnabled: true
         })
@@ -264,6 +269,18 @@ class PullToRefreshListView extends Component {
     }
 
     endLoadMore = (loadedAll) => {
+        let {autoLoadMore} = this.props
+        if(!autoLoadMore) {
+            //wait for ui update, if not, it may occur incorrect content size
+            this.setTimeout(this._endLoadMore.bind(this, loadedAll), 25)
+        }
+        else {
+            //does not wait for ui update, if yes, it may occur incorrect content size
+            this._endLoadMore(loadedAll)
+        }
+    }
+
+    _endLoadMore(loadedAll) {
         let {load_more_none, loaded_all} = viewState
         let {autoLoadMore} = this.props
         if(!loadedAll) {
@@ -382,10 +399,8 @@ class PullToRefreshListView extends Component {
         if (this._afterRefreshBacked) {
             this._afterRefreshBacked = false
         }
-        else {
-            if (this._afterLoadMoreBacked) {
-                this._afterLoadMoreBacked = false
-            }
+        if (this._afterLoadMoreBacked) {
+            this._afterLoadMoreBacked = false
         }
 
         if (e.nativeEvent.contentOffset) {
