@@ -109,7 +109,8 @@ class PullToRefreshListView extends Component {
          * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
          * ScrollView does not exist this strange bug
          */
-        this._fixedBoundary = !props.autoLoadMore && props.viewType == viewType.scrollView ? 0 : StyleSheet.hairlineWidth
+            //this._fixedBoundary = !props.autoLoadMore && props.viewType == viewType.scrollView ? 0 : StyleSheet.hairlineWidth
+        this._fixedBoundary = StyleSheet.hairlineWidth
 
         this._refreshState = refresh_none
         this._loadMoreState = load_more_none
@@ -209,8 +210,7 @@ class PullToRefreshListView extends Component {
     }
 
     endRefresh = () => {
-        //wait for ui update, if not, it may occur incorrect content size
-        this.setTimeout(this._endRefresh, 25)
+        this._endRefresh()
     }
 
     _endRefresh = () => {
@@ -269,15 +269,7 @@ class PullToRefreshListView extends Component {
     }
 
     endLoadMore = (loadedAll) => {
-        let {autoLoadMore} = this.props
-        if(!autoLoadMore) {
-            //wait for ui update, if not, it may occur incorrect content size
-            this.setTimeout(this._endLoadMore.bind(this, loadedAll), 25)
-        }
-        else {
-            //does not wait for ui update, if yes, it may occur incorrect content size
-            this._endLoadMore(loadedAll)
-        }
+        this._endLoadMore(loadedAll)
     }
 
     _endLoadMore(loadedAll) {
@@ -366,11 +358,13 @@ class PullToRefreshListView extends Component {
         this.props.onLayout && this.props.onLayout(e)
     }
 
+    //ensure that onContentSizeChange must be triggered while ending resetHeaderLayout/resetFooterLayout animation
     _onContentSizeChange = (contentWidth, contentHeight) => {
         let {refreshing, loading_more} = viewState
         if (this._scrollViewContentHeight == null
             || ((this._refreshState != refreshing && !this._refreshBackAnimating)
             && (this._loadMoreState != loading_more && !this._loadMoreBackAnimating))) {
+
             this._scrollViewContentHeight = contentHeight
 
             if(this._afterDirectRefresh) {
@@ -647,11 +641,10 @@ class PullToRefreshListView extends Component {
             //    headerHeight = 0
             //}
             /**
-             * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
-             * ScrollView does not exist this strange bug
+             * fix the bug that onContentSizeChange sometimes is not triggered, it causes incorrect contentHeight(this._scrollViewContentHeight)
              */
-            if (headerHeight < this._fixedBoundary) {
-                headerHeight = this._fixedBoundary
+            if (headerHeight < this._fixedBoundary * 2) {
+                headerHeight = this._fixedBoundary * 2
             }
         }
         this._header.setNativeProps({
@@ -668,7 +661,7 @@ class PullToRefreshListView extends Component {
                      * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
                      * ScrollView does not exist this strange bug
                      */
-                    height: this._fixedBoundary
+                    height: headerHeight - this._fixedBoundary
                 }
             })
             if (this._fixedScrollY > 0) {
@@ -729,14 +722,13 @@ class PullToRefreshListView extends Component {
             //    scrollViewTranslateY = scrollViewTranslateMaxY
             //}
             /**
-             * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
-             * ScrollView does not exist this strange bug
+             * fix the bug that onContentSizeChange sometimes is not triggered, it causes incorrect contentHeight(this._scrollViewContentHeight)
              */
-            if (footerHeight < this._fixedBoundary) {
-                footerHeight = this._fixedBoundary
+            if (footerHeight < this._fixedBoundary * 2) {
+                footerHeight = this._fixedBoundary * 2
             }
-            if (scrollViewTranslateY > scrollViewTranslateMaxY - this._fixedBoundary) {
-                scrollViewTranslateY = scrollViewTranslateMaxY - this._fixedBoundary
+            if (scrollViewTranslateY > scrollViewTranslateMaxY - this._fixedBoundary * 2) {
+                scrollViewTranslateY = scrollViewTranslateMaxY - this._fixedBoundary * 2
             }
         }
 
@@ -745,10 +737,20 @@ class PullToRefreshListView extends Component {
                 height: footerHeight,
             }
         })
-
         this._scrollView.scrollTo({ y: this._fixedScrollY - scrollViewTranslateY, animated: false, })
 
         if (timestamp - this._beginTimeStamp > refreshAnimationDuration) {
+            /**
+             * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+             * ScrollView does not exist this strange bug
+             */
+            this._footer.setNativeProps({
+                style: {
+                    height: footerHeight - this._fixedBoundary,
+                }
+            })
+            this._scrollView.scrollTo({ y: this._fixedScrollY - scrollViewTranslateY + this._fixedBoundary, animated: false, })
+
             this._beginTimeStamp = null
             this._loadMoreBackAnimating = false
             this._afterLoadMoreBacked = true
