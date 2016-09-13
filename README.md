@@ -57,7 +57,7 @@ protected List<ReactPackage> getPackages() {
 
 ```
 
-* If you're using react-native 0.30+, follow these extra steps
+* If you're using react-native 0.30-, follow these extra steps
 
     * In node_modules/react-native-smart-pull-to-refresh-listview/android/src/main/java/com/reactnativecomponent/swiperefreshlayout/
 
@@ -66,8 +66,8 @@ protected List<ReactPackage> getPackages() {
             ```
             ...
             public TouchEvent(int viewTag, long timestampMs, int movement) {
-                //super(viewTag, timestampMs);  //for older version
-                super(viewTag);                 //for newer version
+                super(viewTag, timestampMs);    //for older version
+                //super(viewTag);                 //for newer version
                 this.movement = movement;
             }
             ...
@@ -77,8 +77,8 @@ protected List<ReactPackage> getPackages() {
             ```
             ...
             public TouchUpEvent(int viewTag, long timestampMs) {
-                //super(viewTag, timestampMs);  //for older verion
-                super(viewTag);                 //for newer version
+                super(viewTag, timestampMs);  //for older verion
+                //super(viewTag);                 //for newer version
             }
             ...
             ```
