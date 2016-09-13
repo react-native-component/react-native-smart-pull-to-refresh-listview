@@ -9,7 +9,7 @@ public class TouchEvent extends Event<TouchEvent> {
     private int movement;
 
     public TouchEvent(int viewTag, long timestampMs, int movement) {
-        super(viewTag, timestampMs);
+        super(viewTag);
         this.movement = movement;
     }
 

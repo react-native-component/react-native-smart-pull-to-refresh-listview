@@ -6,7 +6,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 public class TouchUpEvent extends Event<TouchUpEvent> {
 
     public TouchUpEvent(int viewTag, long timestampMs) {
-        super(viewTag, timestampMs);
+        super(viewTag);
     }
 
     @Override
