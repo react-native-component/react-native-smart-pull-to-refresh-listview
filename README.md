@@ -1,4 +1,10 @@
 # react-native-smart-pull-to-refresh-listview
+
+[![npm](https://img.shields.io/npm/v/react-native-smart-pull-to-refresh-listview.svg)](https://www.npmjs.com/package/react-native-smart-pull-to-refresh-listview)
+[![npm](https://img.shields.io/npm/dm/react-native-smart-pull-to-refresh-listview.svg)](https://www.npmjs.com/package/react-native-smart-pull-to-refresh-listview)
+[![npm](https://img.shields.io/npm/dt/react-native-smart-pull-to-refresh-listview.svg)](https://www.npmjs.com/package/react-native-smart-pull-to-refresh-listview)
+[![npm](https://img.shields.io/npm/l/react-native-smart-pull-to-refresh-listview.svg)](https://github.com/react-native-component/react-native-smart-pull-to-refresh-listview/blob/master/LICENSE)
+
 A smart pull-down-refresh and pull-up-loadmore react-native listview,
 for ios, written in pure JS, for android, written in JS and Java.
 
