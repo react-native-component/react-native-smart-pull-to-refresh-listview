@@ -471,6 +471,7 @@ class PullToRefreshListView extends Component {
         this.props.onLayout && this.props.onLayout(e)
     }
 
+    //ensure that onContentSizeChange must be triggered while ending resetHeaderLayout/resetFooterLayout animation
     _onContentSizeChange = (contentWidth, contentHeight) => {
         let {refreshing, loading_more} = viewState
         if (this._scrollViewContentHeight == null
@@ -645,8 +646,14 @@ class PullToRefreshListView extends Component {
         }
         else {
             headerHeight = pullDownStayDistance - (pullDownStayDistance - this._fixedScrollY) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
-            if (headerHeight < 0) {
-                headerHeight = 0
+            //if (headerHeight < 0) {
+            //    headerHeight = 0
+            //}
+            /**
+             * fix the bug that onContentSizeChange sometimes is not triggered, it causes incorrect contentHeight(this._scrollViewContentHeight)
+             */
+            if (headerHeight < StyleSheet.hairlineWidth) {
+                headerHeight = StyleSheet.hairlineWidth
             }
         }
         this._header.setNativeProps({
@@ -658,7 +665,8 @@ class PullToRefreshListView extends Component {
         if (timestamp - this._beginTimeStamp > refreshAnimationDuration) {
             this._header.setNativeProps({
                 style: {
-                    height: 0,
+                    //height: 0,
+                    height: headerHeight - StyleSheet.hairlineWidth
                 }
             })
             if (this._fixedScrollY > 0) {
@@ -720,11 +728,20 @@ class PullToRefreshListView extends Component {
                 scrollViewTranslateMaxY = this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)
             }
             scrollViewTranslateY = scrollViewTranslateMaxY * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
-            if (footerHeight < 0) {
-                footerHeight = 0
+            //if (footerHeight < 0) {
+            //    footerHeight = 0
+            //}
+            //if (scrollViewTranslateY > scrollViewTranslateMaxY) {
+            //    scrollViewTranslateY = scrollViewTranslateMaxY
+            //}
+            /**
+             * fix the bug that onContentSizeChange sometimes is not triggered, it causes incorrect contentHeight(this._scrollViewContentHeight)
+             */
+            if (footerHeight < StyleSheet.hairlineWidth) {
+                footerHeight = StyleSheet.hairlineWidth
             }
-            if (scrollViewTranslateY > scrollViewTranslateMaxY) {
-                scrollViewTranslateY = scrollViewTranslateMaxY
+            if (scrollViewTranslateY > scrollViewTranslateMaxY - StyleSheet.hairlineWidth) {
+                scrollViewTranslateY = scrollViewTranslateMaxY - StyleSheet.hairlineWidth
             }
         }
 
@@ -737,6 +754,15 @@ class PullToRefreshListView extends Component {
         this._scrollView.scrollTo({ y: this._fixedScrollY - scrollViewTranslateY, animated: false, })
 
         if (timestamp - this._beginTimeStamp > refreshAnimationDuration) {
+
+            this._footer.setNativeProps({
+                style: {
+                    height: footerHeight - StyleSheet.hairlineWidth,
+                }
+            })
+            this._scrollView.scrollTo({ y: this._fixedScrollY - scrollViewTranslateY + StyleSheet.hairlineWidth, animated: false, })
+
+
             this._beginTimeStamp = null
             this._loadMoreBackAnimating = false
             this._afterLoadMoreBacked = true
