@@ -645,7 +645,7 @@ class PullToRefreshListView extends Component {
             this._fixedScrollY = this._scrollY > 0 ? this._scrollY : 0
         }
         else {
-            headerHeight = pullDownStayDistance - (pullDownStayDistance - this._fixedScrollY) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            headerHeight = pullDownStayDistance - (pullDownStayDistance - this._fixedScrollY - StyleSheet.hairlineWidth) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
             //if (headerHeight < 0) {
             //    headerHeight = 0
             //}
@@ -665,8 +665,7 @@ class PullToRefreshListView extends Component {
         if (timestamp - this._beginTimeStamp > refreshAnimationDuration) {
             this._header.setNativeProps({
                 style: {
-                    //height: 0,
-                    height: headerHeight - StyleSheet.hairlineWidth
+                    height: 0,
                 }
             })
             if (this._fixedScrollY > 0) {
@@ -719,7 +718,7 @@ class PullToRefreshListView extends Component {
         }
         else {
             let scrollViewTranslateMaxY
-            footerHeight = pullUpStayDistance - pullUpStayDistance * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            footerHeight = pullUpStayDistance - (pullUpStayDistance - StyleSheet.hairlineWidth) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
 
             if (this._touching && (this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)) > pullUpStayDistance) {
                 scrollViewTranslateMaxY = pullUpStayDistance
@@ -727,7 +726,7 @@ class PullToRefreshListView extends Component {
             else {
                 scrollViewTranslateMaxY = this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)
             }
-            scrollViewTranslateY = scrollViewTranslateMaxY * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            scrollViewTranslateY = (scrollViewTranslateMaxY - StyleSheet.hairlineWidth) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
             //if (footerHeight < 0) {
             //    footerHeight = 0
             //}
@@ -757,7 +756,7 @@ class PullToRefreshListView extends Component {
 
             this._footer.setNativeProps({
                 style: {
-                    height: footerHeight - StyleSheet.hairlineWidth,
+                    height: 0,
                 }
             })
             this._scrollView.scrollTo({ y: this._fixedScrollY - scrollViewTranslateY + StyleSheet.hairlineWidth, animated: false, })
