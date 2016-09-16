@@ -240,7 +240,7 @@ class PullToRefreshListView extends Component {
                 }
             })
 
-            this._scrollView.scrollTo({ y: this._scrollY - pullDownStayDistance, animated: false, })
+            this._scrollView.scrollTo({ y: this._scrollY - pullDownStayDistance + this._fixedBoundary, animated: false, })
             this._beginTimeStamp = null
             this._refreshBackAnimating = false
             this._afterRefreshBacked = true
@@ -635,7 +635,8 @@ class PullToRefreshListView extends Component {
             this._fixedScrollY = this._scrollY > 0 ? this._scrollY : 0
         }
         else {
-            headerHeight = pullDownStayDistance - (pullDownStayDistance - this._fixedScrollY) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            //headerHeight = pullDownStayDistance - (pullDownStayDistance - this._fixedScrollY) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            headerHeight = pullDownStayDistance - (pullDownStayDistance - this._fixedScrollY - this._fixedBoundary - StyleSheet.hairlineWidth) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
             //if (headerHeight < 0) {
             //    headerHeight = 0
             //}
@@ -660,7 +661,7 @@ class PullToRefreshListView extends Component {
                      * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
                      * ScrollView does not exist this strange bug
                      */
-                    height: headerHeight - StyleSheet.hairlineWidth
+                    height: this._fixedBoundary
                 }
             })
             if (this._fixedScrollY > 0) {
@@ -705,7 +706,8 @@ class PullToRefreshListView extends Component {
         }
         else {
             let scrollViewTranslateMaxY
-            footerHeight = pullUpStayDistance - pullUpStayDistance * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            //footerHeight = pullUpStayDistance - pullUpStayDistance * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            footerHeight = pullUpStayDistance - (pullUpStayDistance - this._fixedBoundary - StyleSheet.hairlineWidth) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
 
             if (this._touching && (this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)) > pullUpStayDistance) {
                 scrollViewTranslateMaxY = pullUpStayDistance
@@ -713,7 +715,7 @@ class PullToRefreshListView extends Component {
             else {
                 scrollViewTranslateMaxY = this._fixedScrollY - (this._scrollViewContentHeight - this._scrollViewContainerHeight)
             }
-            scrollViewTranslateY = scrollViewTranslateMaxY * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
+            scrollViewTranslateY = (scrollViewTranslateMaxY - this._fixedBoundary - StyleSheet.hairlineWidth) * (timestamp - this._beginTimeStamp) / refreshAnimationDuration
             //if (footerHeight < 0) {
             //    footerHeight = 0
             //}
@@ -745,7 +747,7 @@ class PullToRefreshListView extends Component {
              */
             this._footer.setNativeProps({
                 style: {
-                    height: footerHeight - StyleSheet.hairlineWidth,
+                    height: this._fixedBoundary,
                 }
             })
             this._scrollView.scrollTo({ y: this._fixedScrollY - scrollViewTranslateY + StyleSheet.hairlineWidth, animated: false, })
