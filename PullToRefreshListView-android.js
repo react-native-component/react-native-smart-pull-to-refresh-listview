@@ -35,6 +35,9 @@ import { easeOutCirc, } from './easing'
 import RefreshView from './RefreshView'
 import AndroidSwipeRefreshLayout from './AndroidSwipeRefreshLayout'
 
+//temp log code
+//import Temp from 'react-native-fs'
+
 const styles = StyleSheet.create({
     header: {
         justifyContent: 'flex-end',
@@ -193,6 +196,10 @@ class PullToRefreshListView extends Component {
     }
 
     endRefresh = () => {
+        this._scrollView.setNativeProps({
+            scrollEnabled: false
+        })
+
         let {refresh_none, loaded_all, load_more_none} = viewState
         let {pullDownStayDistance} = this.props
         this._refreshState = refresh_none
@@ -206,12 +213,12 @@ class PullToRefreshListView extends Component {
             this.requestAnimationFrame(this._resetHeaderLayout)
         }
         else {
-            this._swipeRefreshLayout.setNativeProps({
-                refreshing: false,
-            })
-            this._scrollView.setNativeProps({
-                scrollEnabled: true,
-            })
+            //this._swipeRefreshLayout.setNativeProps({
+            //    refreshing: false,
+            //})
+            //this._scrollView.setNativeProps({
+            //    scrollEnabled: true,
+            //})
             this._header.setNativeProps({
                 style: {
                     height: 0,
@@ -243,10 +250,21 @@ class PullToRefreshListView extends Component {
                 })
             }
 
+            this._swipeRefreshLayout.setNativeProps({
+                refreshing: false,
+            })
+            this._scrollView.setNativeProps({
+                scrollEnabled: true,
+            })
+
         }
     }
 
     endLoadMore = (loadedAll) => {
+        this._scrollView.setNativeProps({
+            scrollEnabled: false
+        })
+
         let {load_more_none, loaded_all} = viewState
         let {autoLoadMore} = this.props
         if(!loadedAll) {
@@ -266,12 +284,12 @@ class PullToRefreshListView extends Component {
                 this.requestAnimationFrame(this._resetFooterLayout)
             }
             else {
-                this._swipeRefreshLayout.setNativeProps({
-                    refreshing: false,
-                })
-                this._scrollView.setNativeProps({
-                    scrollEnabled: true,
-                })
+                //this._swipeRefreshLayout.setNativeProps({
+                //    refreshing: false,
+                //})
+                //this._scrollView.setNativeProps({
+                //    scrollEnabled: true,
+                //})
                 this._footer.setNativeProps({
                     style: {
                         height: 0,
@@ -284,11 +302,26 @@ class PullToRefreshListView extends Component {
                 this._afterLoadMoreBacked = true
 
                 this._setPaddingBlank()
+
+                this._swipeRefreshLayout.setNativeProps({
+                    refreshing: false,
+                })
+                this._scrollView.setNativeProps({
+                    scrollEnabled: true,
+                })
             }
         }
         else {
             this._setPaddingBlank()
+
+            this._swipeRefreshLayout.setNativeProps({
+                refreshing: false,
+            })
+            this._scrollView.setNativeProps({
+                scrollEnabled: true,
+            })
         }
+        this._scrollView.forceUpdate()
     }
 
     _onSwipe = (movement) => {
@@ -503,15 +536,21 @@ class PullToRefreshListView extends Component {
 
         /**
          * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)Android ScrollView scrolls to bottom may occur scrollTop larger than it should be
+         * only occurs under android 4.4
          */
-        if(this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
-            this._scrollY = this._scrollViewContentHeight - this._scrollViewContainerHeight
-            this._scrollView.scrollTo({y: this._scrollY, animated: false, })
-        }
+        //if(this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
+        //    this._scrollY = this._scrollViewContentHeight - this._scrollViewContainerHeight
+        //    this._scrollView.scrollTo({y: this._scrollY, animated: false, })
+        //}
 
         if(autoLoadMore && withinErrorMargin(this._scrollY, this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold)
             || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold ) {
             if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
+                //disable swipe event
+                this._swipeRefreshLayout.setNativeProps({
+                    refreshing: true,
+                })
+
                 this._loadMoreState = loading_more
                 this._footer.setState({
                     pullState: this._loadMoreState,
@@ -684,13 +723,13 @@ class PullToRefreshListView extends Component {
                 }
             })
 
-            //enabled swipe event
-            this._swipeRefreshLayout.setNativeProps({
-                refreshing: false,
-            })
-            this._scrollView.setNativeProps({
-                scrollEnabled: true,
-            })
+            ////enabled swipe event
+            //this._swipeRefreshLayout.setNativeProps({
+            //    refreshing: false,
+            //})
+            //this._scrollView.setNativeProps({
+            //    scrollEnabled: true,
+            //})
 
             //reset loadMoreState to load_more_none
             if(this._loadMoreState == loaded_all) {
@@ -700,6 +739,14 @@ class PullToRefreshListView extends Component {
                     pullDistancePercent: 0,
                 })
             }
+
+            //enabled swipe event
+            this._swipeRefreshLayout.setNativeProps({
+                refreshing: false,
+            })
+            this._scrollView.setNativeProps({
+                scrollEnabled: true,
+            })
 
             return
         }
