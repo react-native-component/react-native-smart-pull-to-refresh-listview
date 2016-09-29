@@ -209,12 +209,8 @@ class PullToRefreshListView extends Component {
     }
 
     endRefresh = () => {
-        this._endRefresh()
-    }
-
-    _endRefresh = () => {
         this._scrollView.setNativeProps({
-            scrollEnabled: true
+            scrollEnabled: false
         })
         let {refresh_none, loaded_all, load_more_none} = viewState
         let {pullDownStayDistance} = this.props
@@ -264,14 +260,18 @@ class PullToRefreshListView extends Component {
                     pullDistancePercent: 0,
                 })
             }
+
+            this._scrollView.setNativeProps({
+                scrollEnabled: true
+            })
         }
     }
 
     endLoadMore = (loadedAll) => {
-        this._endLoadMore(loadedAll)
-    }
+        this._scrollView.setNativeProps({
+            scrollEnabled: false
+        })
 
-    _endLoadMore(loadedAll) {
         let {load_more_none, loaded_all} = viewState
         let {autoLoadMore} = this.props
         if(!loadedAll) {
@@ -308,10 +308,18 @@ class PullToRefreshListView extends Component {
                 this._afterLoadMoreBacked = true
 
                 this._setPaddingBlank()
+
+                this._scrollView.setNativeProps({
+                    scrollEnabled: true,
+                })
             }
         }
         else {
             this._setPaddingBlank()
+
+            this._scrollView.setNativeProps({
+                scrollEnabled: true,
+            })
         }
     }
 
@@ -689,6 +697,10 @@ class PullToRefreshListView extends Component {
                 })
             }
 
+            this._scrollView.setNativeProps({
+                scrollEnabled: true
+            })
+
             return
         }
 
@@ -757,6 +769,10 @@ class PullToRefreshListView extends Component {
             this._afterLoadMoreBacked = true
 
             this._setPaddingBlank()
+
+            this._scrollView.setNativeProps({
+                scrollEnabled: true,
+            })
 
             return
         }
