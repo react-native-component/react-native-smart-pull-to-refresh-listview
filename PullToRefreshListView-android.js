@@ -96,6 +96,7 @@ class PullToRefreshListView extends Component {
         pullUpStayDistance: PropTypes.number,
         pullDownDistance: PropTypes.number,
         pullDownStayDistance: PropTypes.number,
+        onEndReachedThreshold: PropTypes.number,
         enabledPullUp: PropTypes.bool,
         enabledPullDown: PropTypes.bool,
         autoLoadMore: PropTypes.bool,
@@ -107,21 +108,6 @@ class PullToRefreshListView extends Component {
         super(props)
         this.state = {}
         let {refresh_none, load_more_none} = viewState
-
-        if(props.autoLoadMore && props.viewType == viewType.listView) {
-            this._onEndReached = () => {
-                let { refreshing, load_more_none, loading_more,} = viewState
-                if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
-                    this._loadMoreState = loading_more
-                    this._footer.setState({
-                        pullState: this._loadMoreState,
-                    })
-
-                    props.onLoadMore && props.onLoadMore()
-                }
-            }
-        }
-
         this._refreshState = refresh_none
         this._loadMoreState = load_more_none
         this._refreshBackAnimating = false
@@ -168,7 +154,6 @@ class PullToRefreshListView extends Component {
                         {...this.props}
                         style={[this.props.style, styles.paddingVertical,]}
                         contentContainerStyle={[this.props.contentContainerStyle, styles.marginVertical,]}
-                        onEndReached={this._onEndReached}
                         onLayout={this._onLayout}
                         onContentSizeChange={this._onContentSizeChange}
                         onResponderGrant={this._onResponderGrant}
@@ -557,23 +542,20 @@ class PullToRefreshListView extends Component {
         //    this._scrollView.scrollTo({y: this._scrollY, animated: false, })
         //}
 
-        //use onEndReached handler when viewType is 'listView' to fix double triggering onLoadMore sometimes, but no idea when viewType is 'scrollView'
-        if(this.props.viewType == viewType.scrollView) {
-            if (autoLoadMore && withinErrorMargin(this._scrollY, this._scrollViewContentHeight - this._scrollViewContainerHeight, this.props.onEndReachedThreshold)
-                || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold) {
-                if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
-                    //disable swipe event
-                    this._swipeRefreshLayout.setNativeProps({
-                        refreshing: true,
-                    })
+        if(autoLoadMore && withinErrorMargin(this._scrollY, this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold)
+            || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold ) {
+            if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
+                //disable swipe event
+                this._swipeRefreshLayout.setNativeProps({
+                    refreshing: true,
+                })
 
-                    this._loadMoreState = loading_more
-                    this._footer.setState({
-                        pullState: this._loadMoreState,
-                    })
+                this._loadMoreState = loading_more
+                this._footer.setState({
+                    pullState: this._loadMoreState,
+                })
 
-                    this.props.onLoadMore && this.props.onLoadMore()
-                }
+                this.props.onLoadMore && this.props.onLoadMore()
             }
         }
     }
