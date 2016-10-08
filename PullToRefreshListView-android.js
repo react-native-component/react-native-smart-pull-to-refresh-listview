@@ -321,7 +321,6 @@ class PullToRefreshListView extends Component {
                 scrollEnabled: true,
             })
         }
-        this._scrollView.forceUpdate()
     }
 
     _onSwipe = (movement) => {
@@ -536,7 +535,7 @@ class PullToRefreshListView extends Component {
 
         /**
          * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)Android ScrollView scrolls to bottom may occur scrollTop larger than it should be
-         * only occurs under android 4.4
+         * only occurs on android 4.4-
          */
         //if(this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight) {
         //    this._scrollY = this._scrollViewContentHeight - this._scrollViewContainerHeight
