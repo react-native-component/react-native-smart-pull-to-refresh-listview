@@ -96,7 +96,6 @@ class PullToRefreshListView extends Component {
         pullUpStayDistance: PropTypes.number,
         pullDownDistance: PropTypes.number,
         pullDownStayDistance: PropTypes.number,
-        onEndReachedThreshold: PropTypes.number,
         enabledPullUp: PropTypes.bool,
         enabledPullDown: PropTypes.bool,
         autoLoadMore: PropTypes.bool,
