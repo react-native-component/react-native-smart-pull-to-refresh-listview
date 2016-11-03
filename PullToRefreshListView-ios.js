@@ -33,6 +33,7 @@ import constants, {
 } from './constants'
 import { easeOutCirc, } from './easing'
 import RefreshView from './RefreshView'
+import ListItem from './ListItem'
 
 const styles = StyleSheet.create({
     header: {
@@ -75,7 +76,7 @@ class PullToRefreshListView extends Component {
         }),
         renderRow: () => null,
         renderScrollComponent: props => <ScrollView {...props}/>,
-        onEndReachedThreshold: 0,
+        onEndReachedThreshold: StyleSheet.hairlineWidth,    //0,
         initialListSize: 10,
         stickyHeaderIndices: [],
         pageSize: 1,
@@ -84,6 +85,7 @@ class PullToRefreshListView extends Component {
 
     static propTypes = {
         ...ListView.propTypes,
+        listItemProps: PropTypes.shape(View.propTypes),
         viewType: PropTypes.oneOf([
             viewType.scrollView,
             viewType.listView,
@@ -139,6 +141,8 @@ class PullToRefreshListView extends Component {
         this._fixedScrollY = 0
         this._refreshFixScrollY = 0
         this._paddingBlankDistance = 0
+
+        this._listItemRefs = []
     }
 
     render () {
@@ -169,9 +173,13 @@ class PullToRefreshListView extends Component {
                     onResponderGrant={this._onResponderGrant}
                     onScroll={this._onScroll}
                     onResponderRelease={this._onResponderRelease}
+                    onChangeVisibleRows={this._onChangeVisibleRows}
+                    listItemProps={this.props.listItemProps}
+                    renderRow={this._renderRow}
                     renderHeader={this._renderHeader}
                     renderFooter={this._renderFooter}
                     renderScrollComponent={ props => <ScrollView ref={ (component) => this._innerScrollView = component } {...props} /> }/>
+
         )
     }
 
@@ -813,6 +821,43 @@ class PullToRefreshListView extends Component {
                          viewType={refreshViewType.footer}
                          renderRefreshContent={this.props.renderFooter}/>
         )
+    }
+
+    //only used by listview
+    _renderRow = (rowData, sectionID, rowID) => {
+        let {listItemProps, renderRow,} = this.props
+        if(listItemProps) {
+            return (
+                <ListItem ref={ component => this._listItemRefs[rowID] = component} {...listItemProps}>
+                    {renderRow(rowData, sectionID, rowID)}
+                </ListItem>
+            )
+        }
+        else {
+            return renderRow(rowData, sectionID, rowID)
+        }
+    }
+
+    //only used by listview
+    _onChangeVisibleRows = (visibleRows, changedRows) => {
+        let {listItemProps, onChangeVisibleRows,} = this.props
+        if(listItemProps) {
+            Object.keys(changedRows).forEach( sectionID => {
+                let section = changedRows[sectionID]
+                Object.keys(section).forEach( rowID => {
+                    let listItemRef = this._listItemRefs[ rowID ];
+                    if (section[ rowID ]) {
+                        //console.log(`show rowID = ${rowID}`)
+                        listItemRef.show()
+                    }
+                    else {
+                        //console.log(`hide rowID = ${rowID}`)
+                        listItemRef.hide()
+                    }
+                })
+            })
+        }
+        onChangeVisibleRows && onChangeVisibleRows(visibleRows, changedRows)
     }
 
 }
