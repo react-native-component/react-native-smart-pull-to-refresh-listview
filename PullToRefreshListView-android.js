@@ -34,6 +34,7 @@ import constants, {
 import { easeOutCirc, } from './easing'
 import RefreshView from './RefreshView'
 import AndroidSwipeRefreshLayout from './AndroidSwipeRefreshLayout'
+import ListItem from './ListItem'
 
 //temp log code
 //import Temp from 'react-native-fs'
@@ -79,7 +80,7 @@ class PullToRefreshListView extends Component {
         }),
         renderRow: () => null,
         renderScrollComponent: props => <ScrollView {...props}/>,
-        onEndReachedThreshold: 0,
+        onEndReachedThreshold: StyleSheet.hairlineWidth,    //0,
         initialListSize: 10,
         stickyHeaderIndices: [],
         pageSize: 1,
@@ -88,6 +89,7 @@ class PullToRefreshListView extends Component {
 
     static propTypes = {
         ...ListView.propTypes,
+        listItemProps: PropTypes.shape(View.propTypes),
         viewType: PropTypes.oneOf([
             viewType.scrollView,
             viewType.listView,
@@ -107,6 +109,21 @@ class PullToRefreshListView extends Component {
         super(props)
         this.state = {}
         let {refresh_none, load_more_none} = viewState
+
+        if(props.autoLoadMore && props.viewType == viewType.listView) {
+            this._onEndReached = () => {
+                let { refreshing, load_more_none, loading_more,} = viewState
+                if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
+                    this._loadMoreState = loading_more
+                    this._footer.setState({
+                        pullState: this._loadMoreState,
+                    })
+
+                    props.onLoadMore && props.onLoadMore()
+                }
+            }
+        }
+
         this._refreshState = refresh_none
         this._loadMoreState = load_more_none
         this._refreshBackAnimating = false
@@ -122,6 +139,8 @@ class PullToRefreshListView extends Component {
         this._fixedScrollY = 0
         this._refreshFixScrollY = 0
         this._paddingBlankDistance = 0
+
+        this._listItemRefs = []
     }
 
     render () {
@@ -153,11 +172,14 @@ class PullToRefreshListView extends Component {
                         {...this.props}
                         style={[this.props.style, styles.paddingVertical,]}
                         contentContainerStyle={[this.props.contentContainerStyle, styles.marginVertical,]}
+                        onEndReached={this._onEndReached}
                         onLayout={this._onLayout}
                         onContentSizeChange={this._onContentSizeChange}
                         onResponderGrant={this._onResponderGrant}
                         onScroll={this._onScroll}
                         onResponderRelease={this._onResponderRelease}
+                        listItemProps={this.props.listItemProps}
+                        renderRow={this._renderRow}
                         renderHeader={this._renderHeader}
                         renderFooter={this._renderFooter}
                         renderScrollComponent={ props => <ScrollView ref={ (component) => this._innerScrollView = component } {...props} /> }/> }
@@ -541,20 +563,23 @@ class PullToRefreshListView extends Component {
         //    this._scrollView.scrollTo({y: this._scrollY, animated: false, })
         //}
 
-        if(autoLoadMore && withinErrorMargin(this._scrollY, this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold)
-            || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold ) {
-            if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
-                //disable swipe event
-                this._swipeRefreshLayout.setNativeProps({
-                    refreshing: true,
-                })
+        //use onEndReached handler when viewType is 'listView' to fix double triggering onLoadMore sometimes, but no idea when viewType is 'scrollView'
+        if(this.props.viewType == viewType.scrollView) {
+            if (autoLoadMore && withinErrorMargin(this._scrollY, this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold)
+                || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold) {
+                if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
+                    //disable swipe event
+                    this._swipeRefreshLayout.setNativeProps({
+                        refreshing: true,
+                    })
 
-                this._loadMoreState = loading_more
-                this._footer.setState({
-                    pullState: this._loadMoreState,
-                })
+                    this._loadMoreState = loading_more
+                    this._footer.setState({
+                        pullState: this._loadMoreState,
+                    })
 
-                this.props.onLoadMore && this.props.onLoadMore()
+                    this.props.onLoadMore && this.props.onLoadMore()
+                }
             }
         }
     }
@@ -843,6 +868,21 @@ class PullToRefreshListView extends Component {
                          viewType={refreshViewType.footer}
                          renderRefreshContent={this.props.renderFooter}/>
         )
+    }
+
+    //only used by listview
+    _renderRow = (rowData, sectionID, rowID) => {
+        let {listItemProps, renderRow,} = this.props
+        if(listItemProps) {
+            return (
+                <ListItem ref={ component => this._listItemRefs[rowID] = component} {...listItemProps}>
+                    {renderRow(rowData, sectionID, rowID)}
+                </ListItem>
+            )
+        }
+        else {
+            return renderRow(rowData, sectionID, rowID)
+        }
     }
 
 }
