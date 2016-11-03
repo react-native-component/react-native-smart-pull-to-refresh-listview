@@ -16,6 +16,11 @@
 
 * 貌似0.34版本开始ScrollView/ListView在滚动没有结束前, 除了onScroll事件外的其他代码无法执行, 直到滚动(包括动能)完全结束再执行(这将会影响原有代码逻辑)
 * 要注意ListView的onEndReached事件为native事件, 使用该原生事件代替在js中手动计算是否拉到底可以完全避免有时连续触发二次上拉加载更多数据逻辑
+       onEndReachedThreshold设置为0时可能会存在偏差导致onEndReached事件不触发, 改设为StyleSheet.hairlineWidth
+* 为节省内存, 为配合react-native-smart-image-loader图片懒加载的使用,
+       内嵌新增ListItem, 该组件内部放置listview的行内容,
+       当某项ListItem显示在屏幕范围外时, 将行内容置空, 用以最大限度的释放内存,
+       当某项ListItem显示在屏幕范围内时, 重新加载行内容
 
 * refresh-status:
   0. refresh_none
