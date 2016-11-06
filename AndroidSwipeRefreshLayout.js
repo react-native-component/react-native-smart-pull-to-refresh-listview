@@ -6,6 +6,7 @@ import React, {
 import {
     View,
     requireNativeComponent,
+    Platform,
 } from 'react-native'
 
 export default class AndroidSwipeRefreshLayout extends Component {
@@ -45,4 +46,4 @@ export default class AndroidSwipeRefreshLayout extends Component {
 
 }
 
-const NativeSwipeRefreshLayout = requireNativeComponent('RCTSwipeRefreshLayout', AndroidSwipeRefreshLayout)
+const NativeSwipeRefreshLayout = Platform.OS == 'ios' ? View : requireNativeComponent('RCTSwipeRefreshLayout', AndroidSwipeRefreshLayout)
