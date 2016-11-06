@@ -6,6 +6,7 @@ import React, {
 import {
     View,
     requireNativeComponent,
+    Platform,
 } from 'react-native'
 
 export default class ListItem extends Component {
@@ -40,6 +41,6 @@ export default class ListItem extends Component {
     }
 }
 
-const NativeListItem = requireNativeComponent('RCTLazyLoadView', ListItem)
+const NativeListItem = Platform.OS == 'ios' ? View : requireNativeComponent('RCTLazyLoadView', ListItem)
 
 
