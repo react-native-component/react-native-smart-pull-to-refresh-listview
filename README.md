@@ -393,7 +393,13 @@ pullDownDistance      | number | Yes      | 35        | determines the pull down
 pullDownStayDistance  | number | Yes      | 50        | determines the pull down stay distance
 enabledPullUp         | bool   | Yes      | true      | when the value is false, pull down refresh will be auto
 enabledPullDown       | bool   | Yes      | true      | when the value is false, pull up load more will be auto
+listItemProps         | object | Yes      |           | see [react-native documents][4]
 
+## Special Props
+
+* listItemProps: when set this prop, listView will use special 'listRow',
+the listRow will remove its children when its position is outside viewport of device,
+and will undo when its position is inside viewport of device. Usually it is used with 'react-native-smart-image-loader'
 
 ## Method
 
@@ -401,7 +407,9 @@ enabledPullDown       | bool   | Yes      | true      | when the value is false,
 * endRefresh: end pull down refresh
 * endLoadMore: end pull up load more
 
+
 [0]: https://github.com/cyqresig/ReactNativeComponentDemos
 [1]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-v1.0.1.gif
 [2]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-android-v1.0.1.gif
 [3]: http://facebook.github.io/react-native/docs/listview.html#props
+[4]: http://facebook.github.io/react-native/docs/view.html#props
