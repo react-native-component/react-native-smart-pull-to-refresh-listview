@@ -231,9 +231,9 @@ class PullToRefreshListView extends Component {
     }
 
     endRefresh = () => {
-        this._scrollView.setNativeProps({
-            scrollEnabled: false
-        })
+        //this._scrollView.setNativeProps({
+        //    scrollEnabled: false
+        //})
         let {refresh_none, loaded_all, load_more_none} = viewState
         let {pullDownStayDistance} = this.props
         this._refreshState = refresh_none
@@ -290,9 +290,9 @@ class PullToRefreshListView extends Component {
     }
 
     endLoadMore = (loadedAll) => {
-        this._scrollView.setNativeProps({
-            scrollEnabled: false
-        })
+        //this._scrollView.setNativeProps({
+        //    scrollEnabled: false
+        //})
 
         let {load_more_none, loaded_all} = viewState
         let {autoLoadMore} = this.props
