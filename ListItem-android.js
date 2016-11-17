@@ -14,6 +14,7 @@ export default class ListItem extends Component {
 
     static propTypes = {
         ...View.propTypes,
+        renderChildren: PropTypes.func,
     }
 
     constructor(props) {
@@ -25,9 +26,16 @@ export default class ListItem extends Component {
 
     render() {
         //console.log(`rowID = ${this.props.rowID} -> hidden = ${this.state.hidden}`)
+        //return (
+        //    <NativeListItem {...this.props} onWindowVisibilityChange={this._onWindowVisibilityChange}>
+        //        {!this.state.hidden ? this.props.children : null}
+        //    </NativeListItem>
+        //)
         return (
             <NativeListItem {...this.props} onWindowVisibilityChange={this._onWindowVisibilityChange}>
-                {!this.state.hidden ? this.props.children : null}
+                {this.props.renderChildren ?
+                        this.props.renderChildren.call(this, this.state.hidden)
+                        : !this.state.hidden ? this.props.children : null}
             </NativeListItem>
         )
     }

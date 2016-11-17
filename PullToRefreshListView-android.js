@@ -90,6 +90,7 @@ class PullToRefreshListView extends Component {
     static propTypes = {
         ...ListView.propTypes,
         listItemProps: PropTypes.shape(View.propTypes),
+        renderRowWithVisibility: PropTypes.bool,
         viewType: PropTypes.oneOf([
             viewType.scrollView,
             viewType.listView,
@@ -872,13 +873,22 @@ class PullToRefreshListView extends Component {
 
     //only used by listview
     _renderRow = (rowData, sectionID, rowID) => {
-        let {listItemProps, renderRow,} = this.props
+        let {listItemProps, renderRow, renderRowWithVisibility} = this.props
         if(listItemProps) {
-            return (
-                <ListItem ref={ component => this._listItemRefs[rowID] = component} {...listItemProps}>
-                    {renderRow(rowData, sectionID, rowID)}
-                </ListItem>
-            )
+            if(renderRowWithVisibility) {
+                return (
+                    <ListItem ref={ component => this._listItemRefs[rowID] = component}
+                                {...listItemProps}
+                              renderChildren={renderRow.bind(this, rowData, sectionID, rowID)}/>
+                )
+            }
+            else {
+                return (
+                    <ListItem ref={ component => this._listItemRefs[rowID] = component} {...listItemProps}>
+                        {renderRow(rowData, sectionID, rowID)}
+                    </ListItem>
+                )
+            }
         }
         else {
             return renderRow(rowData, sectionID, rowID)
