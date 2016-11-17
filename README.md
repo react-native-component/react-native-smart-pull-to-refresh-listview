@@ -379,27 +379,35 @@ export default TimerEnhance(PullToRefreshListViewDemo)
 
 ## Props
 
-Prop                  | Type   | Optional | Default   | Description
---------------------- | ------ | -------- | --------- | -----------
-...ListView.propTypes |        |          |           | see [react-native documents][3]
-viewType              | enum   | Yes      | Symbol    | determines the viewType which will be used(ScrollView, ListView)
-autoLoadMore          | bool   | Yes      | false     | when the value is true, pull up load more will be auto
-onRefresh             | func   | Yes      |           | when refreshing, this function will be called
-onLoadMore            | func   | Yes      |           | when loadingMore, this function will be called
-onEndReachedThreshold | number | Yes      | 0         | threshold in pixels (virtual, not physical) for calling onLoadMore
-pullUpDistance        | number | Yes      | 35        | determines the pull up max distance
-pullUpStayDistance    | number | Yes      | 50        | determines the pull up stay distance
-pullDownDistance      | number | Yes      | 35        | determines the pull down max distance
-pullDownStayDistance  | number | Yes      | 50        | determines the pull down stay distance
-enabledPullUp         | bool   | Yes      | true      | when the value is false, pull down refresh will be auto
-enabledPullDown       | bool   | Yes      | true      | when the value is false, pull up load more will be auto
-listItemProps         | object | Yes      |           | see [react-native documents][4]
+Prop                    | Type   | Optional | Default   | Description
+-----------------------| ------ | -------- | --------- | -----------
+...ListView.propTypes   |        |          |           | see [react-native documents][3]
+viewType                | enum   | Yes      | Symbol    | determines the viewType which will be used(ScrollView, ListView)
+autoLoadMore            | bool   | Yes      | false     | when the value is true, pull up load more will be auto
+onRefresh               | func   | Yes      |           | when refreshing, this function will be called
+onLoadMore              | func   | Yes      |           | when loadingMore, this function will be called
+onEndReachedThreshold   | number | Yes      | 0         | threshold in pixels (virtual, not physical) for calling onLoadMore
+pullUpDistance          | number | Yes      | 35        | determines the pull up max distance
+pullUpStayDistance      | number | Yes      | 50        | determines the pull up stay distance
+pullDownDistance        | number | Yes      | 35        | determines the pull down max distance
+pullDownStayDistance    | number | Yes      | 50        | determines the pull down stay distance
+enabledPullUp           | bool   | Yes      | true      | when the value is false, pull down refresh will be auto
+enabledPullDown         | bool   | Yes      | true      | when the value is false, pull up load more will be auto
+listItemProps           | object | Yes      |           | see [react-native documents][4]
+renderRowWithVisibility | bool   | Yes      |           | when the value is true, the children of the listRow can be controlled with 'hidden' state
 
 ## Special Props
 
 * listItemProps: when set this prop, listView will use special 'listRow',
 the listRow will remove its children when its position is outside viewport of device,
-and will undo when its position is inside viewport of device. Usually it is used with 'react-native-smart-image-loader'
+and will undo when its position is inside viewport of device.
+Usually it is used with 'react-native-smart-image-loader'
+
+* renderRowWithVisibility: when the value is true,
+the children of the listRow can be controlled with 'hidden' state.
+This prop is valid when 'listItemProps' is being set, and it is only valid for android.
+Usually it is used with 'react-native-smart-image-loader'
+
 
 ## Method
 
