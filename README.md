@@ -411,8 +411,8 @@ Usually it is used with 'react-native-smart-image-loader'
 
 ## Method
 
-* beginRefresh: force begin pull down refresh
-* endRefresh: end pull down refresh
+* beginRefresh(bounceDisabled): force begin pull down refresh, if bounceDisabled is true, the bounce animation will be disabled
+* endRefresh(bounceDisabled): end pull down refresh, if bounceDisabled is true, the bounce animation will be disabled
 * endLoadMore: end pull up load more
 
 
