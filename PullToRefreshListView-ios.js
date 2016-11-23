@@ -15,9 +15,6 @@ import {
     ListView,
     StyleSheet,
     Text,
-    ActivityIndicator,
-    ProgressBarAndroid,
-    ActivityIndicatorIOS,
     Platform,
 } from 'react-native'
 
@@ -208,11 +205,14 @@ class PullToRefreshListView extends Component {
         this._scrollView.setNativeProps(props)
     }
 
-    beginRefresh = () => {
+    beginRefresh = (bounceDisabled) => {
         this._scrollView.setNativeProps({
             scrollEnabled: false
         })
-        this.requestAnimationFrame(this._resetReverseHeaderLayout)
+        //this.requestAnimationFrame(this._resetReverseHeaderLayout)
+        if(!bounceDisabled) {
+            this.requestAnimationFrame(this._resetReverseHeaderLayout)
+        }
         let {refreshing,} = viewState
         this._refreshState = refreshing
         this._header.setState({
@@ -230,7 +230,7 @@ class PullToRefreshListView extends Component {
         this.props.onRefresh && this.props.onRefresh()
     }
 
-    endRefresh = () => {
+    endRefresh = (bounceDisabled) => {
         //this._scrollView.setNativeProps({
         //    scrollEnabled: false
         //})
@@ -243,7 +243,8 @@ class PullToRefreshListView extends Component {
 
         this._refreshBackAnimating = true
 
-        if (this._scrollY < pullDownStayDistance) {
+        //if (this._scrollY < pullDownStayDistance) {
+        if (!bounceDisabled && this._scrollY < pullDownStayDistance) {
             this.requestAnimationFrame(this._resetHeaderLayout)
         }
         else {
@@ -258,7 +259,10 @@ class PullToRefreshListView extends Component {
                 }
             })
 
-            this._scrollView.scrollTo({ y: this._scrollY - pullDownStayDistance + this._fixedBoundary, animated: false, })
+            //this._scrollView.scrollTo({ y: this._scrollY - pullDownStayDistance + this._fixedBoundary, animated: false, })
+            if(!bounceDisabled) {
+                this._scrollView.scrollTo({ y: this._scrollY - pullDownStayDistance + this._fixedBoundary, animated: false, })
+            }
             this._beginTimeStamp = null
             this._refreshBackAnimating = false
             this._afterRefreshBacked = true
@@ -272,7 +276,8 @@ class PullToRefreshListView extends Component {
                 }
             })
 
-            this._setPaddingBlank()
+            //this._setPaddingBlank()
+            this._setPaddingBlank(bounceDisabled)
 
             //reset loadMoreState to load_more_none
             if(this._loadMoreState == loaded_all) {
@@ -345,10 +350,10 @@ class PullToRefreshListView extends Component {
         }
     }
 
-    _setPaddingBlank = () => {
+    _setPaddingBlank = (paddingDisabled) => {
         let innerViewRef = this._scrollView.refs.InnerScrollView || this._scrollView._innerViewRef || this._innerScrollView.refs.InnerScrollView || this._innerScrollView._innerViewRef
         innerViewRef.measure((ox, oy, width, height, px, py) => {
-            if (height - this._paddingBlankDistance < this._scrollViewContainerHeight) {
+            if (!paddingDisabled && height - this._paddingBlankDistance < this._scrollViewContainerHeight) {
                 this._paddingBlankDistance = this._scrollViewContainerHeight - (height - this._paddingBlankDistance)
             }
             else {
