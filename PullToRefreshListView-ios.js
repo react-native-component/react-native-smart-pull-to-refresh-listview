@@ -139,7 +139,7 @@ class PullToRefreshListView extends Component {
         this._refreshFixScrollY = 0
         this._paddingBlankDistance = 0
 
-        this._listItemRefs = []
+        this._listItemRefs = {}
     }
 
     render () {
@@ -228,6 +228,7 @@ class PullToRefreshListView extends Component {
         })
 
         this.props.onRefresh && this.props.onRefresh()
+        this._listItemRefs = {}
     }
 
     endRefresh = (bounceDisabled) => {
@@ -588,6 +589,7 @@ class PullToRefreshListView extends Component {
             })
 
             this.props.onRefresh && this.props.onRefresh()
+            this._listItemRefs = {}
         }
         else {
             if (this._refreshState != refreshing && this._loadMoreState == will_load_more && !this._loadMoreBackAnimating && !this._afterLoadMoreBacked) {
