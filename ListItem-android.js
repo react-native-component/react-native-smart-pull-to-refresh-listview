@@ -32,7 +32,10 @@ export default class ListItem extends Component {
         //    </NativeListItem>
         //)
         return (
-            <NativeListItem {...this.props} onWindowVisibilityChange={this._onWindowVisibilityChange}>
+            <NativeListItem
+                ref={ component => this._nativeComponent = component }
+                {...this.props}
+                onWindowVisibilityChange={this._onWindowVisibilityChange}>
                 {this.props.renderChildren ?
                         this.props.renderChildren.call(this, this.state.hidden)
                         : !this.state.hidden ? this.props.children : null}
