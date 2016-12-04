@@ -21,6 +21,10 @@
        内嵌新增ListItem, 该组件内部放置listview的行内容,
        当某项ListItem显示在屏幕范围外时, 将行内容置空, 用以最大限度的释放内存,
        当某项ListItem显示在屏幕范围内时, 重新加载行内容
+       由于中低端Android普遍渲染速度跟不上, ListItem的整行内容未渲染出来时导致视图上有空白区域, 故增加了允许只指定行内部的子元素(比如Image)进行操作, 其他子元素内容保持不释放
+* android实现ios效果的sticky-header, 通过计算显示在可视区域内的顺序第一个section-header的位置,
+  以及显示在可视区域内的顺序第一个的row的位置, 来判断当前的sticky-header应设置为哪一个section-header的内容
+
 
 * refresh-status:
   0. refresh_none
