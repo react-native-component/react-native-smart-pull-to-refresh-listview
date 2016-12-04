@@ -395,6 +395,10 @@ enabledPullUp           | bool   | Yes      | true      | when the value is fals
 enabledPullDown         | bool   | Yes      | true      | when the value is false, pull up load more will be auto
 listItemProps           | object | Yes      |           | see [react-native documents][4]
 renderRowWithVisibility | bool   | Yes      |           | when the value is true, the children of the listRow can be controlled with 'hidden' state
+pageTop                 | number | Yes      | 0         | determines the top relative to the page of the float section header(sticky header) view
+floatSectionHeaderWidth | number | Yes      |deviceWidth| determines the width of the float section header(sticky header) view
+renderFloatSectionHeader| number | Yes      | 0         | determines the width of the float section header(sticky header) view
+listSectionProps        | object | Yes      |           | see [react-native documents][4]
 
 ## Special Props
 
@@ -408,6 +412,8 @@ the children of the listRow can be controlled with 'hidden' state.
 This prop is valid when 'listItemProps' is being set, and it is only valid for android.
 Usually it is used with 'react-native-smart-image-loader'
 
+* pageTop, floatSectionHeaderWidth, renderFloatSectionHeader,
+listSectionProps used for android to support ios-like sticky header
 
 ## Method
 
