@@ -16,6 +16,7 @@ import {
     StyleSheet,
     Text,
     Platform,
+    Dimensions,
 } from 'react-native'
 
 //import TimerEnhance from '../react-native-smart-timer-enhance'
@@ -32,6 +33,7 @@ import { easeOutCirc, } from './easing'
 import RefreshView from './RefreshView'
 import AndroidSwipeRefreshLayout from './AndroidSwipeRefreshLayout'
 import ListItem from './ListItem'
+import FloatSectionHeader from './AndroidFloatSectionHeader'
 
 //temp log code
 //import Temp from 'react-native-fs'
@@ -58,6 +60,8 @@ const styles = StyleSheet.create({
     }
 })
 
+const {width: deviceWidth, } = Dimensions.get('window')
+
 class PullToRefreshListView extends Component {
 
     static constants = constants
@@ -82,10 +86,15 @@ class PullToRefreshListView extends Component {
         stickyHeaderIndices: [],
         pageSize: 1,
         scrollRenderAheadDistance: 1000,
+        floatSectionHeaderWidth: deviceWidth,
+        pageTop: 0,
     }
 
     static propTypes = {
         ...ListView.propTypes,
+        renderFloatSectionHeader: PropTypes.func,
+        floatSectionHeaderWidth: PropTypes.number,
+        listSectionProps: PropTypes.shape(View.propTypes),
         listItemProps: PropTypes.shape(View.propTypes),
         renderRowWithVisibility: PropTypes.bool,
         viewType: PropTypes.oneOf([
@@ -108,7 +117,7 @@ class PullToRefreshListView extends Component {
         this.state = {}
         let {refresh_none, load_more_none} = viewState
 
-        if(props.autoLoadMore && props.viewType == viewType.listView) {
+        if (props.autoLoadMore && props.viewType == viewType.listView) {
             this._onEndReached = () => {
                 let { refreshing, load_more_none, loading_more,} = viewState
                 if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
@@ -138,7 +147,8 @@ class PullToRefreshListView extends Component {
         this._refreshFixScrollY = 0
         this._paddingBlankDistance = 0
 
-        this._listItemRefs = []
+        this._listSectionRefs = {}
+        this._listItemRefs = {}
     }
 
     render () {
@@ -176,13 +186,29 @@ class PullToRefreshListView extends Component {
                         onResponderGrant={this._onResponderGrant}
                         onScroll={this._onScroll}
                         onResponderRelease={this._onResponderRelease}
-                        listItemProps={this.props.listItemProps}
+                        renderSectionHeader={this._renderSectionHeader}
                         renderRow={this._renderRow}
                         renderHeader={this._renderHeader}
                         renderFooter={this._renderFooter}
                         renderScrollComponent={ props => <ScrollView ref={ (component) => this._innerScrollView = component } {...props} /> }/> }
+                { this.props.renderFloatSectionHeader && this.props.listSectionProps ?
+                    <FloatSectionHeader
+                        ref={ component => this._floatSectionHeader = component }
+                        {...this.props.listSectionProps}
+                        floatSectionHeaderWidth={this.props.floatSectionHeaderWidth}
+                        renderChildren={this.props.renderFloatSectionHeader}/> : null }
             </AndroidSwipeRefreshLayout>
         )
+    }
+
+    componentDidMount () {
+        let {renderSectionHeader, listSectionProps, dataSource} = this.props
+        //android float section header
+        if (renderSectionHeader && listSectionProps) {
+            let firstSectionID = dataSource.sectionIdentities[0]
+            //set float section header
+            this._floatSectionHeader.setSectionID(firstSectionID)
+        }
     }
 
     setNativeProps = (props) => {
@@ -197,7 +223,7 @@ class PullToRefreshListView extends Component {
             scrollEnabled: false,
         })
         //this.requestAnimationFrame(this._resetReverseHeaderLayout)
-        if(!bounceDisabled) {
+        if (!bounceDisabled) {
             this.requestAnimationFrame(this._resetReverseHeaderLayout)
         }
         let {refreshing,} = viewState
@@ -215,6 +241,8 @@ class PullToRefreshListView extends Component {
         })
 
         this.props.onRefresh && this.props.onRefresh()
+        this._listSectionRefs = {}
+        this._listItemRefs = {}
     }
 
     endRefresh = (bounceDisabled) => {
@@ -249,7 +277,7 @@ class PullToRefreshListView extends Component {
             })
 
             //this._scrollView.scrollTo({ y: this._scrollY - pullDownStayDistance, animated: false, })
-            if(!bounceDisabled) {
+            if (!bounceDisabled) {
                 this._scrollView.scrollTo({ y: this._scrollY - pullDownStayDistance, animated: false, })
             }
             this._beginTimeStamp = null
@@ -269,7 +297,7 @@ class PullToRefreshListView extends Component {
             })
 
             //reset loadMoreState to load_more_none
-            if(this._loadMoreState == loaded_all) {
+            if (this._loadMoreState == loaded_all) {
                 this._loadMoreState = load_more_none
                 this._footer.setState({
                     pullState: this._loadMoreState,
@@ -294,7 +322,7 @@ class PullToRefreshListView extends Component {
 
         let {load_more_none, loaded_all} = viewState
         let {autoLoadMore} = this.props
-        if(!loadedAll) {
+        if (!loadedAll) {
             this._loadMoreState = load_more_none
         }
         else {
@@ -304,7 +332,7 @@ class PullToRefreshListView extends Component {
             pullState: this._loadMoreState,
         })
 
-        if(!autoLoadMore) {
+        if (!autoLoadMore) {
             this._loadMoreBackAnimating = true
 
             if (this._scrollY >= this._scrollViewContentHeight - this._scrollViewContainerHeight) {
@@ -354,7 +382,7 @@ class PullToRefreshListView extends Component {
 
         this._touching = true
 
-        if(this._refreshBackAnimationFrame) {
+        if (this._refreshBackAnimationFrame) {
             this._beginResetScrollTopTimeStamp = null
             this._moveMent = 0
             this.cancelAnimationFrame(this._refreshBackAnimationFrame)
@@ -364,9 +392,9 @@ class PullToRefreshListView extends Component {
             load_more_none, load_more_idle, will_load_more, loading_more, loaded_all,} = viewState
         let {pullUpDistance, pullDownDistance, autoLoadMore, enabledPullUp, enabledPullDown, } = this.props
 
-        if(movement > 0) {
-            if(enabledPullDown) {
-                if(this._refreshState == refresh_none) {
+        if (movement > 0) {
+            if (enabledPullDown) {
+                if (this._refreshState == refresh_none) {
                     this._refreshState = refresh_idle
                 }
                 this._header.setNativeProps({
@@ -395,12 +423,11 @@ class PullToRefreshListView extends Component {
                     })
                 }
 
-
             }
         }
-        else if(movement < 0) {
-            if(enabledPullUp && !autoLoadMore) {
-                if(this._loadMoreState == load_more_none) {
+        else if (movement < 0) {
+            if (enabledPullUp && !autoLoadMore) {
+                if (this._loadMoreState == load_more_none) {
                     this._loadMoreState = load_more_idle
                     this._footer.setState({
                         pullState: this._loadMoreState,
@@ -437,7 +464,7 @@ class PullToRefreshListView extends Component {
             }
         }
         else {
-            if(this._lastMoveMent > 0) {
+            if (this._lastMoveMent > 0) {
                 this._header.setNativeProps({
                     style: {
                         height: 0,
@@ -458,7 +485,7 @@ class PullToRefreshListView extends Component {
     _onRefresh = () => {
         this._touching = false
 
-        if(this._moveMent > 0) {
+        if (this._moveMent > 0) {
             let {will_refresh, refreshing, } = viewState
 
             if (this._refreshState == will_refresh) {
@@ -475,12 +502,14 @@ class PullToRefreshListView extends Component {
                 })
 
                 this.props.onRefresh && this.props.onRefresh()
+                this._listSectionRefs = {}
+                this._listItemRefs = {}
             }
 
             this._refreshBackAnimationFrame = this.requestAnimationFrame(this._resetRefreshScrollTop)
         }
         else {
-            if(this._moveMent < 0) {
+            if (this._moveMent < 0) {
                 let {will_load_more, loading_more, } = viewState
                 if (this._loadMoreState == will_load_more) {
 
@@ -538,17 +567,19 @@ class PullToRefreshListView extends Component {
             && (this._loadMoreState != loading_more && !this._loadMoreBackAnimating))) {
             this._scrollViewContentHeight = contentHeight
 
-            if(this._afterDirectRefresh) {
+            if (this._afterDirectRefresh) {
                 this._afterDirectRefresh = false
 
                 let {pullDownStayDistance} = this.props
 
-                if(this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight + pullDownStayDistance) {
-                    this._scrollView.scrollTo({y: this._scrollViewContentHeight - this._scrollViewContainerHeight, animated: false, })
+                if (this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight + pullDownStayDistance) {
+                    this._scrollView.scrollTo({
+                        y: this._scrollViewContentHeight - this._scrollViewContainerHeight,
+                        animated: false,
+                    })
                 }
 
             }
-
 
         }
 
@@ -557,7 +588,7 @@ class PullToRefreshListView extends Component {
 
     _onScroll = (e) => {
         let {refreshing, load_more_none, loading_more, } = viewState
-        let {autoLoadMore, } = this.props
+        let {autoLoadMore, renderSectionHeader, listSectionProps, pageTop, } = this.props
         this._scrollY = e.nativeEvent.contentOffset.y
 
         /**
@@ -570,7 +601,7 @@ class PullToRefreshListView extends Component {
         //}
 
         //use onEndReached handler when viewType is 'listView' to fix double triggering onLoadMore sometimes, but no idea when viewType is 'scrollView'
-        if(this.props.viewType == viewType.scrollView) {
+        if (this.props.viewType == viewType.scrollView) {
             if (autoLoadMore && withinErrorMargin(this._scrollY, this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold)
                 || this._scrollY > this._scrollViewContentHeight - this._scrollViewContainerHeight - this.props.onEndReachedThreshold) {
                 if (this._refreshState != refreshing && this._loadMoreState == load_more_none) {
@@ -586,6 +617,72 @@ class PullToRefreshListView extends Component {
 
                     this.props.onLoadMore && this.props.onLoadMore()
                 }
+            }
+        }
+        //viewType.listView
+        else {
+            //android float section header
+            if (renderSectionHeader && listSectionProps) {
+
+                let listItemKeys = Object.keys(this._listItemRefs)
+                for (let i = 0, len = listItemKeys.length; i < len; i++) {
+                    let rowID = listItemKeys[ i ]
+                    let { component, sectionID, } = this._listItemRefs[ rowID ]
+                    //console.log(`rowID = ${rowID}, component.state.hidden = ${component.state.hidden}`)
+                    if(!component.state.hidden) {
+                        component._nativeComponent.measure( (ox, oy, width, height, px, py) => {
+                            //console.log(`row -> py = ${py}, height = ${height}, pageTop = ${pageTop}, rowID = ${rowID}, sectionID = ${sectionID}`)
+                            if (py <= height + pageTop) {
+                                //set float section header
+                                this._floatSectionHeader.setSectionID(sectionID)
+                            }
+                        })
+                        return    //do this only once
+                    }
+                }
+                //Object.keys(this._listItemRefs).every( (rowID) => {
+                //    let { component, sectionID, } = this._listItemRefs[rowID]
+                //    console.log(`rowID = ${rowID}, component.state.hidden = ${component.state.hidden}`)
+                //    //if(!component.state.hidden) {
+                //    //    component._nativeComponent.measure( (ox, oy, width, height, px, py) => {
+                //    //        //console.log(`row -> py = ${py}, height = ${height}, pageTop = ${pageTop}, rowID = ${rowID}, sectionID = ${sectionID}`)
+                //    //        if (py <= height + pageTop) {
+                //    //            this._floatSectionHeader.setSectionID(sectionID)
+                //    //        }
+                //    //    })
+                //    //    return false    //do this only once
+                //    //}
+                //})
+
+                let listSectionKeys = Object.keys(this._listSectionRefs)
+                for (let i = 0, len = listSectionKeys.length; i < len; i++) {
+                    let sectionID = listSectionKeys[ i ]
+                    let component = this._listSectionRefs[ sectionID ]
+                    //console.log(`sectionID = ${sectionID}, component.state.hidden = ${component.state.hidden}`)
+                    if(!component.state.hidden) {
+                        component._nativeComponent.measure( (ox, oy, width, height, px, py) => {
+                            //console.log(`section -> py = ${py}, height = ${height}, pageTop = ${pageTop}, sectionID = ${sectionID}`)
+                            if (py <= height + pageTop) {
+                                this._floatSectionHeader.setSectionID(sectionID)
+                            }
+                        })
+                        return    //do this only once
+                    }
+                }
+
+                //Object.keys(this._listSectionRefs).every((sectionID) => {
+                //    let component = this._listSectionRefs[ sectionID ]
+                //    console.log(`sectionID = ${sectionID}, component.state.hidden = ${component.state.hidden}`)
+                //    //if(!component.state.hidden) {
+                //    //    component._nativeComponent.measure( (ox, oy, width, height, px, py) => {
+                //    //        //console.log(`section -> py = ${py}, height = ${height}, pageTop = ${pageTop}, sectionID = ${sectionID}`)
+                //    //        if (py <= height + pageTop) {
+                //    //            this._floatSectionHeader.setSectionID(sectionID)
+                //    //        }
+                //    //    })
+                //    //    return false    //do this only once
+                //    //}
+                //})
             }
         }
     }
@@ -627,11 +724,11 @@ class PullToRefreshListView extends Component {
     _resetRefreshScrollTop = (timestamp) => {
         let {pullDownStayDistance} = this.props
         let {refreshing} = viewState
-        if(this._refreshState != refreshing) {
+        if (this._refreshState != refreshing) {
             pullDownStayDistance = 0
         }
         let headerHeight
-        if(!this._beginResetScrollTopTimeStamp) {
+        if (!this._beginResetScrollTopTimeStamp) {
             headerHeight = this._moveMent
             this._beginResetScrollTopTimeStamp = timestamp
         }
@@ -640,7 +737,7 @@ class PullToRefreshListView extends Component {
             headerHeight = this._moveMent - (this._moveMent - pullDownStayDistance) * easeOutCirc(percent, scrollBounceAnimationDuration * percent, 0, 1, scrollBounceAnimationDuration)
         }
 
-        if(headerHeight < pullDownStayDistance) {
+        if (headerHeight < pullDownStayDistance) {
             headerHeight = pullDownStayDistance
         }
 
@@ -650,7 +747,7 @@ class PullToRefreshListView extends Component {
             }
         })
 
-        if(timestamp - this._beginResetScrollTopTimeStamp > scrollBounceAnimationDuration) {
+        if (timestamp - this._beginResetScrollTopTimeStamp > scrollBounceAnimationDuration) {
             this._beginResetScrollTopTimeStamp = null
             this._moveMent = 0
             return
@@ -662,11 +759,11 @@ class PullToRefreshListView extends Component {
     _resetLoadMoreScrollTop = (timestamp) => {
         let {pullUpStayDistance} = this.props
         let {loading_more} = viewState
-        if(this._loadMoreState != loading_more) {
+        if (this._loadMoreState != loading_more) {
             pullUpStayDistance = 0
         }
         let footerHeight, scrollViewTranslateY
-        if(!this._beginResetScrollTopTimeStamp) {
+        if (!this._beginResetScrollTopTimeStamp) {
             footerHeight = Math.abs(this._moveMent)
             scrollViewTranslateY = 0
             this._beginResetScrollTopTimeStamp = timestamp
@@ -683,7 +780,7 @@ class PullToRefreshListView extends Component {
             }
         }
 
-        if(footerHeight < pullUpStayDistance) {
+        if (footerHeight < pullUpStayDistance) {
             footerHeight = pullUpStayDistance
         }
 
@@ -694,7 +791,7 @@ class PullToRefreshListView extends Component {
         })
         this._scrollView.scrollTo({ y: this._fixedScrollY - scrollViewTranslateY, animated: false, })
 
-        if(timestamp - this._beginResetScrollTopTimeStamp > scrollBounceAnimationDuration) {
+        if (timestamp - this._beginResetScrollTopTimeStamp > scrollBounceAnimationDuration) {
             this._beginResetScrollTopTimeStamp = null
             this._moveMent = 0
             return
@@ -762,7 +859,7 @@ class PullToRefreshListView extends Component {
             //})
 
             //reset loadMoreState to load_more_none
-            if(this._loadMoreState == loaded_all) {
+            if (this._loadMoreState == loaded_all) {
                 this._loadMoreState = load_more_none
                 this._footer.setState({
                     pullState: this._loadMoreState,
@@ -836,8 +933,10 @@ class PullToRefreshListView extends Component {
                     height: 0,
                 }
             })
-            this._scrollView.scrollTo({ y: this._fixedScrollY - scrollViewTranslateY + StyleSheet.hairlineWidth, animated: false, })
-
+            this._scrollView.scrollTo({
+                y: this._fixedScrollY - scrollViewTranslateY + StyleSheet.hairlineWidth,
+                animated: false,
+            })
 
             this._beginTimeStamp = null
             this._loadMoreBackAnimating = false
@@ -877,20 +976,52 @@ class PullToRefreshListView extends Component {
         )
     }
 
+    //only used by listview for android
+    _renderSectionHeader = (sectionData, sectionID) => {
+        let {listSectionProps, renderSectionHeader, renderRowWithVisibility} = this.props
+
+        if (!renderSectionHeader) {
+            return null
+        }
+
+        if (listSectionProps) {
+            if (renderRowWithVisibility) {
+                return (
+                    <ListItem ref={ component => this._listSectionRefs[sectionID] = component }
+                        {...listSectionProps}
+                              renderChildren={renderSectionHeader.bind(this, sectionData, sectionID)}/>
+                )
+            }
+            else {
+                return (
+                    <ListItem ref={ component => this._listSectionRefs[sectionID] = component }
+                        {...listSectionProps}>
+                        {renderSectionHeader(sectionData, sectionID)}
+                    </ListItem>
+                )
+            }
+        }
+        else {
+            return renderSectionHeader(sectionData, sectionID)
+        }
+    }
+
     //only used by listview
     _renderRow = (rowData, sectionID, rowID) => {
         let {listItemProps, renderRow, renderRowWithVisibility} = this.props
-        if(listItemProps) {
-            if(renderRowWithVisibility) {
+
+        if (listItemProps) {
+            if (renderRowWithVisibility) {
                 return (
-                    <ListItem ref={ component => this._listItemRefs[rowID] = component}
-                                {...listItemProps}
+                    <ListItem ref={ component => this._listItemRefs[rowID] = {sectionID, component,} }
+                        {...listItemProps}
                               renderChildren={renderRow.bind(this, rowData, sectionID, rowID)}/>
                 )
             }
             else {
                 return (
-                    <ListItem ref={ component => this._listItemRefs[rowID] = component} {...listItemProps}>
+                    <ListItem ref={ component => this._listItemRefs[rowID] = {sectionID, component,} }
+                        {...listItemProps}>
                         {renderRow(rowData, sectionID, rowID)}
                     </ListItem>
                 )
