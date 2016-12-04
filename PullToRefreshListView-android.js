@@ -92,6 +92,7 @@ class PullToRefreshListView extends Component {
 
     static propTypes = {
         ...ListView.propTypes,
+        pageTop: PropTypes.number,
         renderFloatSectionHeader: PropTypes.func,
         floatSectionHeaderWidth: PropTypes.number,
         listSectionProps: PropTypes.shape(View.propTypes),
