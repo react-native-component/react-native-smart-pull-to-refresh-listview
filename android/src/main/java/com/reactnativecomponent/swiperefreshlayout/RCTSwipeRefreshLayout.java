@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ScrollView;
 
+import com.facebook.react.uimanager.events.NativeGestureUtil;
+
 
 public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingParent,
         NestedScrollingChild {
@@ -34,6 +36,8 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
     private boolean enabledPullUp = true;
     private boolean enabledPullDown = true;
     private int mTouchSlop;
+    private float mPrevTouchX;
+    private boolean mIntercepted;
 
 
     // If nested scrolling is enabled, the total amount that needed to be
@@ -233,6 +237,10 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
 //                    mInitialMotionY = mInitialDownY + mTouchSlop;
                     mIsBeingDragged = !canChildScrollUp(yDiff);
 
+                    if (shouldInterceptTouchEvent(ev)) {
+                        NativeGestureUtil.notifyNativeGestureStarted(this, ev);
+                    }
+
                     return mIsBeingDragged;
                 }
                 break;
@@ -250,6 +258,31 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
         }
 
         return mIsBeingDragged;
+    }
+
+    /**
+     * completely bypasses ViewGroup's "disallowIntercept" by overriding
+     * and never calling super.onInterceptTouchEvent().
+     * This means that horizontal scrolls will always be intercepted, even though they shouldn't, so
+     * we have to check for that manually here.
+     */
+    private boolean shouldInterceptTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mPrevTouchX = ev.getX();
+                mIntercepted = false;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                final float eventX = ev.getX();
+                final float xDiff = Math.abs(eventX - mPrevTouchX);
+
+                if (mIntercepted || xDiff > mTouchSlop) {
+                    mIntercepted = true;
+                    return false;
+                }
+        }
+        return true;
     }
 
     private float getMotionEventY(MotionEvent ev, int activePointerId) {
