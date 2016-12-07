@@ -24,6 +24,7 @@ export default class AndroidFloatSectionHeader extends Component {
     render () {
         return (
             <View
+                ref={ component => this._nativeComponent = component }
                 {...this.props}
                 style={{position: 'absolute', top: 0, left: 0, width: this.props.floatSectionHeaderWidth,}}>
                 {this.props.renderChildren(this.state.sectionID)}
