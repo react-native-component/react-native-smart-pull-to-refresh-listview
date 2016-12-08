@@ -18,6 +18,7 @@ This component is compatible with React Native 0.25 and newer.
 ## Advanced Features
 
 * flexible pull to refresh control for ios and android,
+easy to customize the 'RefreshView' style and content,
 bounce effect for both pull down refresh and pull up load more,
 if you want, you can also use the 'autoLoad' mode for pull up load more.
 [demonstration][101]
