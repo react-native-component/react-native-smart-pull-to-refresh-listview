@@ -8,6 +8,7 @@ import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -239,10 +240,6 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
 //                    mInitialMotionY = mInitialDownY + mTouchSlop;
                     mIsBeingDragged = !canChildScrollUp(yDiff);
 
-                    if (shouldInterceptTouchEvent(ev)) {
-                        NativeGestureUtil.notifyNativeGestureStarted(this, ev);
-                    }
-
                     return mIsBeingDragged;
                 }
                 break;
@@ -295,16 +292,16 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
         return MotionEventCompat.getY(ev, index);
     }
 
+    /**
+     * {@link SwipeRefreshLayout} overrides {@link ViewGroup#requestDisallowInterceptTouchEvent} and
+     * swallows it. This means that any component underneath SwipeRefreshLayout will now interact
+     * incorrectly with Views that are above SwipeRefreshLayout. We fix that by transmitting the call
+     * to this View's parents.
+     */
     @Override
-    public void requestDisallowInterceptTouchEvent(boolean b) {
-        // if this is a List < L or another view that doesn't support nested
-        // scrolling, ignore this request so that the vertical scroll event
-        // isn't stolen
-        if ((android.os.Build.VERSION.SDK_INT < 21 && mTarget instanceof AbsListView)
-                || (mTarget != null && !ViewCompat.isNestedScrollingEnabled(mTarget))) {
-            // Nope.
-        } else {
-            super.requestDisallowInterceptTouchEvent(b);
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        if (getParent() != null) {
+            getParent().requestDisallowInterceptTouchEvent(disallowIntercept);
         }
     }
 
