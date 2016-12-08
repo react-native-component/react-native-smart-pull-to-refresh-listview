@@ -18,6 +18,7 @@ export default class AndroidFloatSectionHeader extends Component {
         super(props)
         this.state = {
             sectionID: '',
+            hidden: true,
         }
     }
 
@@ -25,7 +26,8 @@ export default class AndroidFloatSectionHeader extends Component {
         return (
             <View
                 {...this.props}
-                style={{position: 'absolute', top: 0, left: 0, width: this.props.floatSectionHeaderWidth,}}>
+                style={{position: 'absolute', top: 0, left: 0, width: this.props.floatSectionHeaderWidth,
+                        opacity: !this.state.hidden ? 1 : 0, }}>
                 {this.props.renderChildren(this.state.sectionID)}
             </View>
         )
