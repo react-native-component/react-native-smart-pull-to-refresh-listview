@@ -63,10 +63,12 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
 
 
     private float mLastMargin;
-    private float MoveMargin;
+    private float mMoveMargin;
 
 
     private float density;
+
+    private int moveDirection = 0;  //1表示下拉, -1表示上拉
 
 //    int scrollViewMeasuredHeight;
 
@@ -466,13 +468,60 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
 //                //Log.i("Test", "ACTION_DOWN:"+mActivePointerId);
                 break;
 
+//            case MotionEvent.ACTION_MOVE: {
+//
+//                //判断是否scrollview是否在顶部
+//                //
+//                if (mTarget != null) {
+//                    pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+//                    //Log.i("Test", "ACTION_MOVE:"+pointerIndex);
+//                    if (pointerIndex < 0) {
+////                        Log.e(LOG_TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
+//                        return false;
+//                    }
+//                    if (pointerIndex != mActivePointerId) {
+//
+//                        return true;
+//                    }
+//
+//                    final float y = MotionEventCompat.getY(ev, pointerIndex);
+////                    final float y = ev.getY();
+////                    //Log.i("Test", "ACTION_DOWN:" + mInitialDownY);
+////                    //Log.i("Test", "ACTION_MOVE:" + y);
+//                    final float overscrollTop = (y - mInitialDownY) * DRAG_RATE;
+//
+//                    if (mMoveMargin == 0) {
+//                        mMoveMargin = overscrollTop;
+//                    } else {
+//                        mMoveMargin += overscrollTop - mLastMargin;
+//                    }
+//
+//                    mLastMargin = overscrollTop;
+//                    //Log.i("Test", "mLastMargin:" + mMoveMargin);
+//                    if (mMoveMargin > 0) {
+//
+//                        float newOverscrollTop = mMoveMargin / density;
+//
+//                        mTouchListener.onSwipe((int) newOverscrollTop);
+////                        mTargetMargin = newOverscrollTop;
+////                        moveSpinner(newOverscrollTop);
+//                    } else {
+//
+//                        //上拉
+//                        float newOverscrollTop = mMoveMargin / density;
+//                        mTouchListener.onSwipe((int) newOverscrollTop);
+////                        mTargetMargin = mMoveMargin;
+////                        moveSpinner(newOverscrollTop);
+//                    }
+//
+//                }
+//                break;
+//            }
             case MotionEvent.ACTION_MOVE: {
-
                 //判断是否scrollview是否在顶部
                 //
                 if (mTarget != null) {
-                    pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-                    //Log.i("Test", "ACTION_MOVE:"+pointerIndex);
+                    pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);//获得相对起始点move的点坐标
                     if (pointerIndex < 0) {
 //                        Log.e(LOG_TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
                         return false;
@@ -488,27 +537,63 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
 //                    //Log.i("Test", "ACTION_MOVE:" + y);
                     final float overscrollTop = (y - mInitialDownY) * DRAG_RATE;
 
-                    if (MoveMargin == 0) {
-                        MoveMargin = overscrollTop;
-                    } else {
-                        MoveMargin += overscrollTop - mLastMargin;
+
+                    if (mMoveMargin == 0) {
+                        //之前没有赋值上一次移动距离
+                        if (moveDirection == 0) {
+                            mMoveMargin = overscrollTop;
+                        }
+                    } else if (mMoveMargin > 0) {
+                        //开始下移了 控制负数
+                        if (moveDirection == 0) {
+                            moveDirection = 1;
+                        }
+                        mMoveMargin += overscrollTop - mLastMargin;
+
+                        if (mLastMargin > 0 && mMoveMargin <= 0) {
+                            mMoveMargin = 0;
+                        }
+
+                        if (moveDirection == -1) {
+                            //出现问题
+                            mMoveMargin = 0;
+                        }
+
+                    } else if (mMoveMargin < 0) {
+                        //开始上移了 控制负数
+                        if (moveDirection == 0) {
+                            moveDirection = -1;
+                        }
+                        mMoveMargin += overscrollTop - mLastMargin;
+
+                        if (mLastMargin < 0 && mMoveMargin > 0) {
+                            mMoveMargin = 0;
+                        }
+
+                        if (moveDirection == 1) {
+                            //出现问题
+                            mMoveMargin = 0;
+                        }
+
                     }
 
                     mLastMargin = overscrollTop;
-                    //Log.i("Test", "mLastMargin:" + MoveMargin);
-                    if (MoveMargin > 0) {
+                    //Log.i("Test", "mLastMargin:" + mMoveMargin);
+                    if (moveDirection == 1) {
+                        //下拉
 
-                        float newOverscrollTop = MoveMargin / density;
-
+                        float newOverscrollTop = mMoveMargin / density;
+//                        Log.i("Test", "ACTION_MOVE下拉:" + newOverscrollTop);
                         mTouchListener.onSwipe((int) newOverscrollTop);
 //                        mTargetMargin = newOverscrollTop;
 //                        moveSpinner(newOverscrollTop);
-                    } else {
+                    } else if (moveDirection == -1) {
 
                         //上拉
-                        float newOverscrollTop = MoveMargin / density;
+                        float newOverscrollTop = mMoveMargin / density;
+//                        Log.i("Test", "ACTION_MOVE上拉:" + newOverscrollTop);
                         mTouchListener.onSwipe((int) newOverscrollTop);
-//                        mTargetMargin = MoveMargin;
+//                        mTargetMargin = mMoveMargin;
 //                        moveSpinner(newOverscrollTop);
                     }
 
@@ -531,7 +616,7 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
                 }
                 mInitialDownY = initialDownY;
                 //Log.i("Test", "initialDownY:"+initialDownY);
-                MoveMargin += mLastMargin;
+                mMoveMargin += mLastMargin;
                 break;
             }
 
@@ -549,10 +634,10 @@ public class RCTSwipeRefreshLayout extends ViewGroup implements NestedScrollingP
                     //Log.i(LOG_TAG, "Got ACTION_UP event but don't have an active pointer id.");
 //                    return false;
 //                }
-
+                moveDirection = 0;
 
                 mLastMargin = 0;
-                MoveMargin = 0;
+                mMoveMargin = 0;
 
                 mTouchListener.onSwipeRefresh();
 
