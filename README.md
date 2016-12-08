@@ -15,6 +15,23 @@ This component is compatible with React Native 0.25 and newer.
 ![react-native-pull-to-refresh-listview-preview-ios][1]
 ![react-native-pull-to-refresh-listview-preview-android][2]
 
+## Advanced Features
+
+* flexible pull to refresh control for ios and android,
+bounce effect for both pull down refresh and pull up load more,
+if you want, you can also use the 'autoLoad' mode for pull up load more.
+[demonstration][101]
+
+* memory management for ios and android,
+if you want, the listRow can remove its children to release memory when its position is outside viewport of device,
+and will undo when its position is inside viewport of device.
+[demonstration][102]
+
+* extended support sticky header for android
+it also supports sticky header with pull to refresh
+[demonstration][103]
+
+
 ## Installation
 
 ```
@@ -380,7 +397,7 @@ export default TimerEnhance(PullToRefreshListViewDemo)
 ## Props
 
 Prop                    | Type   | Optional | Default   | Description
------------------------| ------ | -------- | --------- | -----------
+----------------------- | ------ | -------- | --------- | -----------
 ...ListView.propTypes   |        |          |           | see [react-native documents][3]
 viewType                | enum   | Yes      | Symbol    | determines the viewType which will be used(ScrollView, ListView)
 autoLoadMore            | bool   | Yes      | false     | when the value is true, pull up load more will be auto
@@ -403,7 +420,7 @@ listSectionProps        | object | Yes      |           | see [react-native docu
 ## Special Props
 
 * listItemProps: when set this prop, listView will use special 'listRow',
-the listRow will remove its children when its position is outside viewport of device,
+the listRow will remove its children to release memory when its position is outside viewport of device,
 and will undo when its position is inside viewport of device.
 Usually it is used with 'react-native-smart-image-loader'
 
@@ -412,8 +429,8 @@ the children of the listRow can be controlled with 'hidden' state.
 This prop is valid when 'listItemProps' is being set, and it is only valid for android.
 Usually it is used with 'react-native-smart-image-loader'
 
-* pageTop, floatSectionHeaderWidth, renderFloatSectionHeader,
-listSectionProps used for android to support ios-like sticky header
+* pageTop, floatSectionHeaderWidth, renderFloatSectionHeader, listSectionProps
+are used for android to support ios-like sticky header
 
 ## Method
 
@@ -423,7 +440,11 @@ listSectionProps used for android to support ios-like sticky header
 
 
 [0]: https://github.com/cyqresig/ReactNativeComponentDemos
-[1]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-v1.0.1.gif
-[2]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-android-v1.0.1.gif
+[1]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-v1.6.0.gif
+[2]: http://cyqresig.github.io/img/react-native-smart-pull-to-refresh-preview-android-v1.6.0.gif
 [3]: http://facebook.github.io/react-native/docs/listview.html#props
 [4]: http://facebook.github.io/react-native/docs/view.html#props
+
+[101]: http://cyqresig.github.io/img/pull-to-refresh-flexible-pull-to-refresh-control.gif
+[102]: http://cyqresig.github.io/img/pull-to-refresh-memory-management.gif
+[103]: http://cyqresig.github.io/img/pull-to-refresh-extended-support-sticky-header-for-android.gif
