@@ -17,18 +17,21 @@ This component is compatible with React Native 0.25 and newer.
 
 ## Advanced Features
 
-* flexible pull to refresh control for ios and android,
+* Flexible pull to refresh control for ios and android,
+
 easy to customize the 'RefreshView' style and content,
 bounce effect for both pull down refresh and pull up load more,
 if you want, you can also use the 'autoLoad' mode for pull up load more.
 [demonstration][101]
 
-* memory management for ios and android,
+* Memory management for ios and android,
+
 if you want, the listRow can remove its children to release memory when its position is outside viewport of device,
 and will undo when its position is inside viewport of device.
 [demonstration][102]
 
-* extended support sticky header for android
+* Extended support sticky header for android
+
 it also supports sticky header with pull to refresh
 [demonstration][103]
 
