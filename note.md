@@ -25,6 +25,14 @@
 * android实现ios效果的sticky-header, 通过计算显示在可视区域内的顺序第一个section-header的位置,
   以及显示在可视区域内的顺序第一个的row的位置, 来判断当前的sticky-header应设置为哪一个section-header的内容
 
+* 增加在列表数据(不包括刷新头和加载尾的高度)总高度不足撑满列表容器高度时,
+加入条件判定, 使加载尾不显示, 并且也不会在这种情况下autoLoad.
+直到触发下拉刷新并且列表数据总高度再次不足撑满列表容器高度时, 加载尾才会隐藏
+* 修改触发刷新数据方法的时机, 改为等待自定义模拟scrollBack动画结束后才会触发,
+(android上拉加载和下拉刷新都是自定义动画, ios只有下拉刷新是自定义动画, 上拉加载沿用了scrollView的native scrollBack效果),
+ios额外加入了在符合特定条件的情况下, 在onRespondGrant中也会触发.
+(注:原来是在android/_onRefresh, ios/_onRespondRelease方法中触发,
+如触发后返回数据很快, 则调用endRefresh/endLoadMore方法会很快, 这将会导致动画还没执行完就执行其他逻辑, UI有可能会出错)
 
 * refresh-status:
   0. refresh_none
