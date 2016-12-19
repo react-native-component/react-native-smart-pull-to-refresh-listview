@@ -119,10 +119,11 @@ class PullToRefreshListView extends Component {
         }
 
         /**
-         * (occurs on react-native 0.32, and maybe also occurs on react-native 0.30+)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+         * (occurs on react-native 0.32, and maybe also occurs on other versions)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth
+         * (occurs on react-native 0.39, and maybe also occurs on other versions)ListView renderHeader/renderFooter => View's children cannot be visible when parent's height < StyleSheet.hairlineWidth * 2
          * ScrollView does not exist this strange bug
          */
-        this._fixedBoundary = !props.autoLoadMore && props.viewType == viewType.scrollView ? 0 : StyleSheet.hairlineWidth
+        this._fixedBoundary = !props.autoLoadMore && props.viewType == viewType.scrollView ? 0 : StyleSheet.hairlineWidth * 2
 
         this._refreshState = refresh_none
         this._loadMoreState = load_more_none
