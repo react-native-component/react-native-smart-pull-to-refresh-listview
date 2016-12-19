@@ -240,7 +240,7 @@ class PullToRefreshListView extends Component {
             this.requestAnimationFrame(this._resetReverseHeaderLayout)
         }
         else {
-            console.log(`beginRefresh onRefresh()`)
+            //console.log(`beginRefresh onRefresh()`)
             this.props.onRefresh && this.props.onRefresh()
         }
         let {refreshing,} = viewState
@@ -907,7 +907,9 @@ class PullToRefreshListView extends Component {
             this._beginResetScrollTopTimeStamp = null
             this._moveMent = 0
 
-            this.props.onLoadMore && this.props.onLoadMore()
+            if (this._loadMoreState == loading_more) {
+                this.props.onLoadMore && this.props.onLoadMore()
+            }
 
             return
         }
