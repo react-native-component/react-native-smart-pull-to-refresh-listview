@@ -775,6 +775,8 @@ class PullToRefreshListView extends Component {
                 //})
             }
         }
+
+        this.props.onScroll && this.props.onScroll(e)
     }
 
     _resetReverseHeaderLayout = (timestamp) => {
