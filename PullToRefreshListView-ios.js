@@ -244,7 +244,9 @@ class PullToRefreshListView extends Component {
 
     endRefresh = (bounceDisabled) => {
         this._onRefreshed = false
-        this._canLoadMore = false
+        if(!bounceDisabled) {
+            this._canLoadMore = false
+        }
 
         //this._scrollView.setNativeProps({
         //    scrollEnabled: false
