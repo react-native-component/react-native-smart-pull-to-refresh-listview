@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
 })
 
 const {width: deviceWidth, } = Dimensions.get('window')
+const keySeparator = ',';
 
 class PullToRefreshListView extends Component {
 
@@ -1149,14 +1150,14 @@ class PullToRefreshListView extends Component {
         if (listItemProps) {
             if (renderRowWithVisibility) {
                 return (
-                    <ListItem ref={ component => this._listItemRefs[sectionID + rowID] = {sectionID, component,} }
+                    <ListItem ref={ component => this._listItemRefs[sectionID + keySeparator + rowID] = {sectionID, component,} }
                         {...listItemProps}
                               renderChildren={renderRow.bind(this, rowData, sectionID, rowID)}/>
                 )
             }
             else {
                 return (
-                    <ListItem ref={ component => this._listItemRefs[sectionID + rowID] = {sectionID, component,} }
+                    <ListItem ref={ component => this._listItemRefs[sectionID + keySeparator + rowID] = {sectionID, component,} }
                         {...listItemProps}>
                         {renderRow(rowData, sectionID, rowID)}
                     </ListItem>
