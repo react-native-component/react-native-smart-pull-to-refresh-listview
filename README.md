@@ -67,7 +67,7 @@ dependencies {
 }
 ```
 
-* In MainActivity.java
+* In MainApplication.java
 
 ```
 ...
