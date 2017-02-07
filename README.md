@@ -10,10 +10,6 @@ for ios, written in pure JS, for android, written in JS and Java.
 
 This component is compatible with React Native 0.25 and newer.
 
-## Notice
-
-It can only be used until react-native 0.4.0
-
 ## Preview
 
 ![react-native-pull-to-refresh-listview-preview-ios][1]
