@@ -160,7 +160,7 @@ class PullToRefreshListView extends Component {
                     onContentSizeChange={this._onContentSizeChange}
                     onResponderGrant={this._onResponderGrant}
                     onScroll={this._onScroll}
-                    onResponderRelease={this._onResponderRelease}>
+                    onMomentumScrollBegin={this._onResponderRelease}>
                     {this._renderHeader()}
                     {this.props.children}
                     {this._renderFooter()}
@@ -175,7 +175,7 @@ class PullToRefreshListView extends Component {
                     onContentSizeChange={this._onContentSizeChange}
                     onResponderGrant={this._onResponderGrant}
                     onScroll={this._onScroll}
-                    onResponderRelease={this._onResponderRelease}
+                    onMomentumScrollBegin={this._onResponderRelease}
                     onChangeVisibleRows={this._onChangeVisibleRows}
                     listItemProps={this.props.listItemProps}
                     renderRow={this._renderRow}
