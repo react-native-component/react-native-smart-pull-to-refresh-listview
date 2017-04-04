@@ -412,8 +412,8 @@ pullUpDistance          | number | Yes      | 35        | determines the pull up
 pullUpStayDistance      | number | Yes      | 50        | determines the pull up stay distance
 pullDownDistance        | number | Yes      | 35        | determines the pull down max distance
 pullDownStayDistance    | number | Yes      | 50        | determines the pull down stay distance
-enabledPullUp           | bool   | Yes      | true      | when the value is false, pull down refresh will be auto
-enabledPullDown         | bool   | Yes      | true      | when the value is false, pull up load more will be auto
+enabledPullUp           | bool   | Yes      | true      | when the value is false, pull down refresh will be disabled
+enabledPullDown         | bool   | Yes      | true      | when the value is false, pull up load more will be disabled
 listItemProps           | object | Yes      |           | see [react-native documents][4]
 renderRowWithVisibility | bool   | Yes      |           | when the value is true, the children of the listRow can be controlled with 'hidden' state
 pageTop                 | number | Yes      | 0         | determines the top relative to the page of the float section header(sticky header) view
