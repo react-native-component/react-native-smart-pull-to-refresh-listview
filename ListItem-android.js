@@ -1,19 +1,20 @@
 
 import React, {
-    PropTypes,
     Component,
 } from 'react'
+import PropTypes from 'prop-types';
 import {
     View,
     requireNativeComponent,
     Platform,
+    ViewPropTypes,
 } from 'react-native'
 
 export default class ListItem extends Component {
 
 
     static propTypes = {
-        ...View.propTypes,
+        ...ViewPropTypes,
         renderChildren: PropTypes.func,
     }
 
@@ -53,5 +54,3 @@ export default class ListItem extends Component {
 }
 
 const NativeListItem = Platform.OS == 'ios' ? View : requireNativeComponent('RCTLazyLoadView', ListItem)
-
-
