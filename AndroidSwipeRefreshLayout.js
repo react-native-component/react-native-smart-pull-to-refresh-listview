@@ -1,18 +1,19 @@
 
 import React, {
-    PropTypes,
     Component,
 } from 'react'
+import PropTypes from 'prop-types';
 import {
     View,
     requireNativeComponent,
     Platform,
+    ViewPropTypes,
 } from 'react-native'
 
 export default class AndroidSwipeRefreshLayout extends Component {
 
     static propTypes = {
-        ...View.propTypes,
+        ...ViewPropTypes,
         refreshing: PropTypes.bool,
         enabledPullUp: PropTypes.bool,
         enabledPullDown: PropTypes.bool,
